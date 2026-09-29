@@ -183,7 +183,7 @@
     </table>
     <ol start="5" type="1">
     <li>If a file is missing in a fresh environment, use the volume's <strong>Actions</strong> upload option and select that original file. Inspect the destination before submitting. Do not replace an existing different version without review.</li>
-    <li>Compare names and hashes with <a href="../reference/source-assets.json">source-assets.json</a>. Lab 1 no longer includes a source-inventory task.</li>
+    <li>Compare filenames with the table above. Lab 2 Task 11 verifies PDF hashes using <a href="../reference/pdf-manifest.json">pdf-manifest.json</a>.</li>
     <li>Leave <code>models_all_MiniLM_L12_v2.onnx</code> local. The native knowledge base handles embeddings; this edition does not upload that model.</li>
     </ol>
     <p>The notebook filesystem path is:</p>
@@ -203,7 +203,6 @@
   config/
     workshop.json
   reference/
-    project_context_contract.json
     pdf-manifest.json
   notebooks/
     Lab1A_Bronze_Ingestion.ipynb
@@ -212,7 +211,7 @@
     Lab2_Predict_Investigate_and_Operationalize.ipynb
   seer_aidp_labs.job</code></pre>
     <p>For a fresh import, create the folders first, upload ordinary support files into their matching folders, and import the IPYNBs as notebooks. Keep the folder structure intact. The native notebook metadata may report <code>Workspace/Shared/...</code> without the leading slash; Python filesystem reads use <code>/Workspace/Shared/...</code>.</p>
-    <p><strong>Checkpoint:</strong> All four notebooks open with multiple Markdown/code cells: Bronze has 7 code cells, Silver 7, Gold 3, and Lab 2 has 12. All contain their own Python logic, without workspace library imports. An empty text editor or one large JSON cell indicates an incorrect import.</p>
+    <p><strong>Checkpoint:</strong> All four notebooks open with multiple Markdown/code cells: Bronze has 7 code cells, Silver 7, Gold 3, and Lab 2 has 11. All contain their own Python logic, without workspace library imports. Only <code>config/workshop.json</code> and <code>reference/pdf-manifest.json</code> are required support files. An empty text editor or one large JSON cell indicates an incorrect import.</p>
     </section>
     <section id="task-4-inspect-compute-and-dependencies" class="level2">
     <h2>Task 4: Inspect compute and dependencies</h2>
@@ -236,12 +235,11 @@
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;scikit-learn&quot;</span>, sklearn.__version__)</span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;MLflow&quot;</span>, mlflow.__version__)</span>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>root <span class="op">=</span> Path(<span class="st">&quot;/Workspace/Shared/seer-aidp-livelabs&quot;</span>)</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> (root <span class="op">/</span> <span class="st">&quot;reference/pdf-manifest.json&quot;</span>).is_file()</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> (root <span class="op">/</span> <span class="st">&quot;config/workshop.json&quot;</span>).is_file()</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> (root <span class="op">/</span> <span class="st">&quot;reference/pdf-manifest.json&quot;</span>).is_file()</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> Path(<span class="st">&quot;/Volumes/seer_livelabs_20260922/seer_bronze/source_files&quot;</span>).is_dir()</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="st">&quot;spark&quot;</span> <span class="kw">in</span> <span class="bu">globals</span>(), <span class="st">&quot;Attach the dedicated Spark cluster.&quot;</span></span></code></pre></div>
-    <p>Do not set <code>SEER_LOCAL_TEST=1</code> in AIDP. That flag bypasses Spark persistence and is only for offline package tests. Do not put credentials in a notebook cell.</p>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> (root <span class="op">/</span> <span class="st">&quot;config/workshop.json&quot;</span>).is_file()</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> (root <span class="op">/</span> <span class="st">&quot;reference/pdf-manifest.json&quot;</span>).is_file()</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> Path(<span class="st">&quot;/Volumes/seer_livelabs_20260922/seer_bronze/source_files&quot;</span>).is_dir()</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="st">&quot;spark&quot;</span> <span class="kw">in</span> <span class="bu">globals</span>(), <span class="st">&quot;Attach the dedicated Spark cluster.&quot;</span></span></code></pre></div>
+    <p>Use the attached Spark runtime and AIDP's integrated MLflow authentication. Do not put credentials in a notebook cell.</p>
     </section>
     <section id="task-5-attach-compute-and-learn-the-notebook-controls" class="level2">
     <h2>Task 5: Attach compute and learn the notebook controls</h2>

@@ -35,15 +35,7 @@ Open **Workflow → Jobs → seer_aidp_labs.job → Tasks**. Replace the single 
 6. Set job parameter `config_path` to `/Workspace/Shared/seer-aidp-livelabs/config/workshop.json`. The Bronze/Silver setup cells use this default path directly; Gold and Lab 2 also accept the parameter.
 7. Save, reopen the job and verify every notebook path and dependency.
 
-The [native request template](../workflows/seer-labs.template.json) can be rendered for the existing cluster:
-
-```bash
-python tools/render_workflow.py \
-  --cluster-key "<your-cluster-key>" \
-  --cluster-name seer_livelabs_spark
-```
-
-Rendering prepares JSON only; it does not update or run the live job. The deployed request (private deployment record; not distributed) records the four tasks.
+The optional [native request template](../workflows/seer-labs.template.json) shows the same four-task configuration. For API-based setup, replace `__CLUSTER_KEY__`, `__CLUSTER_NAME__`, `__WORKSPACE_FOLDER__` and `__CONFIG_PATH__` with your own values before submitting it through your approved AIDP tooling. Editing the template does not create or execute a job. No local rendering script is required for the UI steps above.
 
 ## Task 3: Execute and verify
 

@@ -16,6 +16,6 @@ tmp/
 notebook-backups/
 aidp-livelabs/deployment/
 aidp-livelabs/validation/*
-!aidp-livelabs/validation/README.md
+aidp-livelabs/tools/
 aidp-livelabs/config/*.local.json
 aidp-livelabs/workflows/*.rendered.json

@@ -78,7 +78,7 @@ No ALH database login, ONNX runtime or GPU is required. Lab 1 uses Spark DataFra
 
 
 5. If a file is missing in a fresh environment, use the volume's **Actions** upload option and select that original file. Inspect the destination before submitting. Do not replace an existing different version without review.
-6. Compare names and hashes with [source-assets.json](../reference/source-assets.json). Lab 1 no longer includes a source-inventory task.
+6. Compare filenames with the table above. Lab 2 Task 11 verifies PDF hashes using [pdf-manifest.json](../reference/pdf-manifest.json).
 7. Leave `models_all_MiniLM_L12_v2.onnx` local. The native knowledge base handles embeddings; this edition does not upload that model.
 
 The notebook filesystem path is:
@@ -105,7 +105,6 @@ seer-aidp-livelabs/
   config/
     workshop.json
   reference/
-    project_context_contract.json
     pdf-manifest.json
   notebooks/
     Lab1A_Bronze_Ingestion.ipynb
@@ -117,7 +116,7 @@ seer-aidp-livelabs/
 
 For a fresh import, create the folders first, upload ordinary support files into their matching folders, and import the IPYNBs as notebooks. Keep the folder structure intact. The native notebook metadata may report `Workspace/Shared/...` without the leading slash; Python filesystem reads use `/Workspace/Shared/...`.
 
-**Checkpoint:** All four notebooks open with multiple Markdown/code cells: Bronze has 7 code cells, Silver 7, Gold 3, and Lab 2 has 12. All contain their own Python logic, without workspace library imports. An empty text editor or one large JSON cell indicates an incorrect import.
+**Checkpoint:** All four notebooks open with multiple Markdown/code cells: Bronze has 7 code cells, Silver 7, Gold 3, and Lab 2 has 11. All contain their own Python logic, without workspace library imports. Only `config/workshop.json` and `reference/pdf-manifest.json` are required support files. An empty text editor or one large JSON cell indicates an incorrect import.
 
 ## Task 4: Inspect compute and dependencies
 
@@ -144,14 +143,13 @@ print("numpy", numpy.__version__)
 print("scikit-learn", sklearn.__version__)
 print("MLflow", mlflow.__version__)
 root = Path("/Workspace/Shared/seer-aidp-livelabs")
-assert (root / "reference/pdf-manifest.json").is_file()
 assert (root / "config/workshop.json").is_file()
 assert (root / "reference/pdf-manifest.json").is_file()
 assert Path("/Volumes/seer_livelabs_20260922/seer_bronze/source_files").is_dir()
 assert "spark" in globals(), "Attach the dedicated Spark cluster."
 ```
 
-Do not set `SEER_LOCAL_TEST=1` in AIDP. That flag bypasses Spark persistence and is only for offline package tests. Do not put credentials in a notebook cell.
+Use the attached Spark runtime and AIDP's integrated MLflow authentication. Do not put credentials in a notebook cell.
 
 ## Task 5: Attach compute and learn the notebook controls
 

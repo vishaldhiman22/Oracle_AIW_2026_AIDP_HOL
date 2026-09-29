@@ -39,7 +39,7 @@ All five CSV files and three project PDFs are included at the repository root. N
 | [Austin receiving inspection report](documents_austin_receiving_inspection_report.pdf) | Project document staged in Task 11 |
 | [Austin structural specification](documents_austin_structural_engineering_specification.pdf) | Project document staged in Task 11 |
 
-The classifier is trained on generated synthetic history, not on these PDFs or the three current Gold rows. It then scores the Gold feature rows produced by Lab 1C. File hashes are supplied in [the source manifest](aidp-livelabs/reference/source-assets.json).
+The classifier is trained on generated synthetic history, not on these PDFs or the three current Gold rows. It then scores the Gold feature rows produced by Lab 1C. Task 11 checks the PDFs against [the PDF manifest](aidp-livelabs/reference/pdf-manifest.json).
 
 ## Bring your own AIDP environment
 
@@ -50,20 +50,18 @@ The classifier is trained on generated synthetic history, not on these PDFs or t
 
 **Reset warning:** Lab 1 drops and recreates its 12 named tables without backups. Use only a dedicated learning environment. Lab 2 keeps experiment/model history and replaces its predictions table. See [rerun guidance](aidp-livelabs/docs/reruns.md).
 
-Training history is synthetic and the supplied source data is a teaching fixture. Metrics and predictions are not production forecasts. Learner logic is inline in the notebooks; `tools/test_support` contains historical authoring-test references, not AIDP dependencies.
+Training history is synthetic and the supplied source data is a teaching fixture. Metrics and predictions are not production forecasts. All learner logic is inline in the notebooks; no support Python libraries or authoring tools are required.
 
-## Public distribution and checks
+## Required runtime files
 
-This repository contains source notebooks, sample CSV/PDF inputs, support JSON, workflow templates, text guides, and authoring tools. Private deployment receipts, resource OCIDs, executed notebooks, logs, personal filesystem paths, screenshots with account details, generated PDF/ZIP exports, virtual environments, and caches are excluded. The original private workspace is unchanged.
+Upload only these files to the corresponding AIDP workspace folders:
 
-From `aidp-livelabs`, use Python 3 with NumPy and pandas:
+- The four `.ipynb` files in `aidp-livelabs/notebooks/`.
+- `aidp-livelabs/config/workshop.json`, read by all four notebooks.
+- `aidp-livelabs/reference/pdf-manifest.json`, read only by Lab 2 Task 11.
 
-```bash
-python tools/validate_lab1_structure.py
-python tools/validate_maintenance.py
-python tools/validate_lab2_independence.py
-```
+Upload the five CSVs and three PDFs separately to the source volume. Instructions and the optional workflow template are provided for learners; they are not notebook runtime dependencies.
 
-Optional HTML generation requires Pandoc and Pillow: `python tools/build_guide.py`, then `python tools/validate_guide.py`. To build a PDF, install ReportLab, pypdf and Pillow, provide DejaVu fonts via `AIDP_GUIDE_FONT_DIR`, and run `python tools/build_pdf.py`. Authoring packages are local tools; do not install them over AIDP's managed MLflow runtime.
+The authoring tools, historical test helpers, unused reference files and unused evidence configuration have been removed from this learner package. Private deployment receipts, resource OCIDs, executed notebooks, logs, personal filesystem paths, account screenshots, generated PDF/ZIP exports, virtual environments and caches are also excluded.
 
 Adapted from Oracle LiveLabs material by Eli Schilling and the LiveLabs/ONA Lab Experience teams. See [source mapping and attribution](aidp-livelabs/docs/conversion-map.md). This independently maintained repository is not an Oracle-published replacement.
