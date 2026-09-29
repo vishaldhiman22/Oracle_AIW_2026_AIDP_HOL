@@ -1,0 +1,24 @@
+{
+  "product": "PROJECT_CONTEXT",
+  "version": "1.0.0",
+  "primary_key": ["project_id", "asset_id"],
+  "columns": [
+    {"name":"project_id","type":"STRING","nullable":false,"definition":"Stable project reference shared by the source extracts"},
+    {"name":"asset_id","type":"STRING","nullable":false,"definition":"Canonical asset key from the documented fixture crosswalk"},
+    {"name":"project_name","type":"STRING","nullable":false,"definition":"Project name from the Primavera-style schedule extract"},
+    {"name":"asset_name","type":"STRING","nullable":false,"definition":"Canonical asset name from the financial asset extract"},
+    {"name":"supplier_name","type":"STRING","nullable":false,"definition":"Conformed supplier names or UNRESOLVED when no source mapping exists"},
+    {"name":"current_milestone","type":"STRING","nullable":false,"definition":"Explicitly selected workshop activity, not a computed latest milestone"},
+    {"name":"milestone_status","type":"STRING","nullable":false,"definition":"Status of the selected activity in the schedule extract"},
+    {"name":"purchase_order_status","type":"STRING","nullable":false,"definition":"Sorted distinct status values across the project's purchase orders"},
+    {"name":"inspection_status","type":"STRING","nullable":false,"definition":"Worst observed inspection outcome: FAIL, REQUEST_INFO, otherwise PASS"},
+    {"name":"committed_cost_cents","type":"LONG","nullable":false,"definition":"Sum of purchase order amounts in integer USD cents, including all order statuses"},
+    {"name":"currency_code","type":"STRING","nullable":false,"definition":"USD; mixed-currency inputs fail validation"},
+    {"name":"purchase_order_count","type":"LONG","nullable":false,"definition":"Count of source purchase order rows before joining other entities"},
+    {"name":"inspection_count","type":"LONG","nullable":false,"definition":"Count of source inspection rows before joining other entities"},
+    {"name":"decision_readiness","type":"STRING","nullable":false,"definition":"Context availability or review flag; not engineering or purchase approval"},
+    {"name":"source_extracted_at","type":"STRING","nullable":false,"definition":"Oldest known source extraction time in ISO-8601; supplier time is unavailable"},
+    {"name":"last_successful_refresh","type":"STRING","nullable":false,"definition":"UTC notebook table-build timestamp in ISO-8601"},
+    {"name":"run_id","type":"STRING","nullable":false,"definition":"AIDP job run identifier, or explicit interactive/local validation label"}
+  ]
+}

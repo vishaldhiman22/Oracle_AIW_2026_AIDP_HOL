@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Run the four-notebook workflow · Seer AIDP Workshop</title>
+  <link rel="stylesheet" href="../docs/guide.css">
+</head>
+<body>
+  <a class="skip" href="#content">Skip to lesson</a>
+  <header class="banner"><a href="../README.html">SEER / AIDP WORKSHOP</a><span>Lakehouse data → MLflow experiments → predictions</span></header>
+  <aside aria-label="Workshop navigation">
+    <p class="eyebrow">WORKSHOP GUIDE</p>
+    <nav class="chapters" aria-label="Chapters">
+      <a href="../README.html">Overview</a>
+      <a href="../docs/00-setup.html">Before you begin</a>
+      <a href="../docs/01-lab1.html">Lab 1 · Lakehouse foundation</a>
+      <a href="../docs/02-lab2.html">Lab 2 · Train, register and predict</a>
+      <a href="../docs/knowledge-base.html">Optional PDF knowledge-base extension</a>
+      <a href="../docs/workflow.html">Optional workflow execution</a>
+      <a href="../docs/learner-evidence.html">Learner evidence</a>
+    </nav>
+    <p class="eyebrow">ON THIS PAGE</p>
+    <nav class="contents" aria-label="Table of contents"><ul>
+<li><a href="#run-the-four-notebook-workflow" id="toc-run-the-four-notebook-workflow">Run the four-notebook workflow</a>
+<ul>
+<li><a href="#prerequisites-and-deployment-status" id="toc-prerequisites-and-deployment-status">Prerequisites and deployment status</a></li>
+<li><a href="#task-1-deploy-the-four-notebooks" id="toc-task-1-deploy-the-four-notebooks">Task 1: Deploy the four notebooks</a></li>
+<li><a href="#task-2-update-the-existing-job" id="toc-task-2-update-the-existing-job">Task 2: Update the existing job</a></li>
+<li><a href="#task-3-execute-and-verify" id="toc-task-3-execute-and-verify">Task 3: Execute and verify</a></li>
+<li><a href="#reruns" id="toc-reruns">Reruns</a></li>
+</ul></li>
+</ul></nav>
+  </aside>
+  <main id="content">
+    <div class="edition">TWO-LAB EDITION · SEPTEMBER 2026 · PYTHON NOTEBOOKS + AIDP WORKFLOWS</div>
+    <section id="run-the-four-notebook-workflow" class="level1">
+    <h1>Run the four-notebook workflow</h1>
+    <p><a href="02-lab2.html">Back to Lab 2</a></p>
+    <section id="prerequisites-and-deployment-status" class="level2">
+    <h2>Prerequisites and deployment status</h2>
+    <p>The workflow uses four notebook tasks. All three layers remain in the standard catalog <code>seer_livelabs_20260922</code>. Complete <a href="01-lab1.html">Lab 1</a> setup and stop concurrent writers before a run.</p>
+    </section>
+    <section id="task-1-deploy-the-four-notebooks" class="level2">
+    <h2>Task 1: Deploy the four notebooks</h2>
+    <ol type="1">
+    <li>Open workspace <strong>seer_livelabs_20260922</strong>.</li>
+    <li>Import the four IPYNB files into <strong>Shared → seer-aidp-livelabs → notebooks</strong>.</li>
+    <li>Verify <code>config/workshop.json</code>: the catalog and all three schema names are unchanged.</li>
+    <li>Confirm each notebook opens with separate Markdown and Python cells.</li>
+    <li>Keep the PDF volume and source volume at their existing standard-catalog locations.</li>
+    <li>Use the split notebooks rather than the superseded monolithic Lab 1 notebook.</li>
+    </ol>
+    </section>
+    <section id="task-2-update-the-existing-job" class="level2">
+    <h2>Task 2: Update the existing job</h2>
+    <p>Open <strong>Workflow → Jobs → seer_aidp_labs.job → Tasks</strong>. Replace the single Lab 1 task with the following three tasks and change Lab 2's dependency.</p>
+    <table>
+    <thead>
+    <tr>
+    <th>Task key</th>
+    <th>Notebook</th>
+    <th>Depends on</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td><code>lab1_bronze</code></td>
+    <td><code>Lab1A_Bronze_Ingestion.ipynb</code></td>
+    <td>None</td>
+    </tr>
+    <tr>
+    <td><code>lab1_silver</code></td>
+    <td><code>Lab1B_Silver_Transformations.ipynb</code></td>
+    <td><code>lab1_bronze</code></td>
+    </tr>
+    <tr>
+    <td><code>lab1_gold</code></td>
+    <td><code>Lab1C_Gold_Project_Data.ipynb</code></td>
+    <td><code>lab1_silver</code></td>
+    </tr>
+    <tr>
+    <td><code>lab2_predict_and_assess</code></td>
+    <td><code>Lab2_Predict_Investigate_and_Operationalize.ipynb</code></td>
+    <td><code>lab1_gold</code></td>
+    </tr>
+    </tbody>
+    </table>
+    <ol type="1">
+    <li>Use <strong>Notebook task</strong>, <strong>Workspace</strong> source and <strong>seer_livelabs_spark</strong> for every task.</li>
+    <li>Set each dependency condition to <strong>All success</strong>.</li>
+    <li>Keep <strong>Max concurrent runs = 1</strong>, no schedule, and a 90-minute job timeout.</li>
+    <li>Give the Lab 1 tasks 30-minute timeouts and Lab 2 a 60-minute timeout.</li>
+    <li>Pass <code>run_id = {{job.run_id}}</code> to all tasks. Gold and Lab 2 stamp persisted rows with this value.</li>
+    <li>Set job parameter <code>config_path</code> to <code>/Workspace/Shared/seer-aidp-livelabs/config/workshop.json</code>. The Bronze/Silver setup cells use this default path directly; Gold and Lab 2 also accept the parameter.</li>
+    <li>Save, reopen the job and verify every notebook path and dependency.</li>
+    </ol>
+    <p>The <a href="../workflows/seer-labs.template.json">native request template</a> can be rendered for the existing cluster:</p>
+    <div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> tools/render_workflow.py <span class="dt">\</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">--cluster-key</span> <span class="st">&quot;&lt;your-cluster-key&gt;&quot;</span> <span class="dt">\</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">--cluster-name</span> seer_livelabs_spark</span></code></pre></div>
+    <p>Rendering prepares JSON only; it does not update or run the live job. The deployed request (private deployment record; not distributed) records the four tasks.</p>
+    </section>
+    <section id="task-3-execute-and-verify" class="level2">
+    <h2>Task 3: Execute and verify</h2>
+    <ol type="1">
+    <li>Stop concurrent interactive writes.</li>
+    <li>Choose <strong>Run now</strong> once and open the new run.</li>
+    <li>Check tasks execute Bronze → Silver → Gold → Lab 2.</li>
+    <li>Inspect each task's notebook output. All four must reach <strong>Success</strong>.</li>
+    <li>Confirm two Lab 1 Gold tables and Lab 2's predictions are in <code>seer_livelabs_20260922.seer_gold</code>.</li>
+    <li>Compare project counts and costs with the local reference checks. For Lab 2, verify both three-run rounds, the six-run comparison, the registered model/version, and the notebook's registered-model score read-back check.</li>
+    <li>Open Gold lineage and verify upstream Silver/Bronze relationships through all three layers.</li>
+    <li>Run KB ingestion separately after PDF staging; the workflow does not ingest the KB or wait for the UI exercise.</li>
+    </ol>
+    <p>If Gold fails on schema visibility, object creation or write permissions, stop and resolve that specific issue before rerunning downstream tasks. Do not change catalogs to work around a permissions failure.</p>
+    </section>
+    <section id="reruns" class="level2">
+    <h2>Reruns</h2>
+    <p>No prior experiment, model or table deletion is needed. <strong>Run now on the full workflow repeats both Lab 1 and Lab 2</strong>, whereas running the Lab 2 notebook alone reads the existing Lab 1 tables. Follow <a href="reruns.html">rerun guidance</a> to choose the appropriate restart point.</p>
+    <p>Bronze, Silver, and Gold each recreate one named Delta table per write cell; prior Delta history/table-specific metadata are not preserved. These are not atomic multi-table publications.</p>
+    <p>The fixture should continue to yield three context rows, three eligible milestones, Austin committed cost 167,390,000 cents, and total cost 473,090,000 cents. Classification probabilities are synthetic demonstration outputs, not validated operational predictions.</p>
+    <p>Lab 2 adds six runs to the same experiment and registers another version of the selected model on each complete execution. Its session tag keeps each two-round comparison separate. Do not enable automatic Lab 2 retries: a retry can create extra experiment runs/model versions. Model artifacts remain in MLOps storage, not extra Gold Delta tables.</p>
+    <p>Do not run an interactive writer alongside the workflow; max concurrency one only limits workflow runs. If a Lab 2 task partially fails, inspect its outputs and the model Versions list before retrying. Another complete Lab 2 execution starts a new comparison session; it need not delete partial history. The KB and document assistant are reused separately and are not automatically ingested or tested.</p>
+    <p>Return to <a href="02-lab2.html">Lab 2</a>.</p>
+    </section>
+    </section>
+    <footer>Locally authored adaptation of Oracle LiveLabs. Screenshots are real setup views; expected numeric outputs are local reference results. Record your own cloud execution evidence.</footer>
+  </main>
+</body>
+</html>

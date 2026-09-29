@@ -1,0 +1,42 @@
+[
+  {
+    "filename": "source-data_suppliers_supplier_extract.csv",
+    "bytes": 845,
+    "sha256": "727ade6f803fafae87271b3883b112bc58c73adb8296985ddee820328a915c3b"
+  },
+  {
+    "filename": "source-data_assets_financial_assets.csv",
+    "bytes": 614,
+    "sha256": "8dfec750c8fb905ffb1583b404fe990df13bcd0a7fffa3daf33aef6b95b1829c"
+  },
+  {
+    "filename": "source-data_purchasing_purchase_orders.csv",
+    "bytes": 808,
+    "sha256": "43a3ec711261a260a7f7bd38d60a453aa083d1ab2543581f1efd055d4ff3f4ec"
+  },
+  {
+    "filename": "source-data_schedules_project_milestones.csv",
+    "bytes": 814,
+    "sha256": "82b2ed1090d436e270453822a5e297522e9576833b14e4ff9aca3bc446fa8cdc"
+  },
+  {
+    "filename": "source-data_inspections_inspection_findings.csv",
+    "bytes": 1027,
+    "sha256": "deb20a329a4a75e520df6fcd7e1aa96cebfcc13f1b1dbf36db381c0078cd994f"
+  },
+  {
+    "filename": "documents_atlas_supplier_framework_agreement.pdf",
+    "bytes": 2989,
+    "sha256": "8f649a4af62f39605daf06c0dd3ae42893b54b73e9790b8f0b9344ab9af97e6a"
+  },
+  {
+    "filename": "documents_austin_receiving_inspection_report.pdf",
+    "bytes": 3017,
+    "sha256": "aef42ea1ba84f106dd4ea23f8bf1c8c0a4b1623233c3eba2cc95ee5a865accb0"
+  },
+  {
+    "filename": "documents_austin_structural_engineering_specification.pdf",
+    "bytes": 6814,
+    "sha256": "ab7a45469d111e1936decd23fd80ae4397750972e5435a155e3f9815d869006d"
+  }
+]

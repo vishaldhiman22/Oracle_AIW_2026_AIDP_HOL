@@ -1,0 +1,13 @@
+{
+  "knowledge_base_key": null,
+  "data_source_key": null,
+  "ingestion_run_id": null,
+  "native_status": null,
+  "normalized_status": null,
+  "source_folder": null,
+  "source_manifest_sha256": null,
+  "completed_at": null,
+  "verified_by": null,
+  "verified_at": null,
+  "notes": "Template only. Supply actual UI evidence after successful ingestion. Do not invent identifiers or mark ingestion successful because PDFs were copied."
+}

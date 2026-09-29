@@ -1,0 +1,24 @@
+{
+  "catalog": "seer_livelabs_20260922",
+  "schemas": {
+    "bronze": "seer_bronze",
+    "silver": "seer_silver",
+    "gold": "seer_gold"
+  },
+  "source_root": "/Volumes/seer_livelabs_20260922/seer_bronze/source_files",
+  "output_root": "/Volumes/seer_livelabs_20260922/seer_gold/workshop_outputs",
+  "source_layout": "flat",
+  "fixture_as_of": "2026-07-14T01:00:00+00:00",
+  "freshness_sla_minutes": 1440,
+  "max_driver_rows": 10000,
+  "security_review": "NOT_REVIEWED",
+  "owner": "Seer data product owner - assign before publication",
+  "contract_version": "1.0.0",
+  "classification": "WORKSHOP_SAMPLE",
+  "fail_on_not_ready": false,
+  "synthetic_seed": 234582,
+  "synthetic_rows": 1800,
+  "training_cutoff": "2026-01-01T00:00:00+00:00",
+  "classification_threshold": 0.5,
+  "kb_evidence_path": ""
+}

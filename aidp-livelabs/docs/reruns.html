@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rerunning Lab 1 and Lab 2 · Seer AIDP Workshop</title>
+  <link rel="stylesheet" href="../docs/guide.css">
+</head>
+<body>
+  <a class="skip" href="#content">Skip to lesson</a>
+  <header class="banner"><a href="../README.html">SEER / AIDP WORKSHOP</a><span>Lakehouse data → MLflow experiments → predictions</span></header>
+  <aside aria-label="Workshop navigation">
+    <p class="eyebrow">WORKSHOP GUIDE</p>
+    <nav class="chapters" aria-label="Chapters">
+      <a href="../README.html">Overview</a>
+      <a href="../docs/00-setup.html">Before you begin</a>
+      <a href="../docs/01-lab1.html">Lab 1 · Lakehouse foundation</a>
+      <a href="../docs/02-lab2.html">Lab 2 · Train, register and predict</a>
+      <a href="../docs/knowledge-base.html">Optional PDF knowledge-base extension</a>
+      <a href="../docs/workflow.html">Optional workflow execution</a>
+      <a href="../docs/learner-evidence.html">Learner evidence</a>
+    </nav>
+    <p class="eyebrow">ON THIS PAGE</p>
+    <nav class="contents" aria-label="Table of contents"><ul>
+<li><a href="#rerunning-lab-1-and-lab-2" id="toc-rerunning-lab-1-and-lab-2">Rerunning Lab 1 and Lab 2</a>
+<ul>
+<li><a href="#what-each-rerun-changes" id="toc-what-each-rerun-changes">What each rerun changes</a></li>
+<li><a href="#lab-1-choose-where-to-restart" id="toc-lab-1-choose-where-to-restart">Lab 1: choose where to restart</a></li>
+<li><a href="#lab-2-repeat-a-complete-walkthrough" id="toc-lab-2-repeat-a-complete-walkthrough">Lab 2: repeat a complete walkthrough</a></li>
+<li><a href="#separate-optional-knowledge-base-exercise" id="toc-separate-optional-knowledge-base-exercise">Separate optional knowledge-base exercise</a></li>
+<li><a href="#concurrency-and-optional-cleanup" id="toc-concurrency-and-optional-cleanup">Concurrency and optional cleanup</a></li>
+</ul></li>
+</ul></nav>
+  </aside>
+  <main id="content">
+    <div class="edition">TWO-LAB EDITION · SEPTEMBER 2026 · PYTHON NOTEBOOKS + AIDP WORKFLOWS</div>
+    <section id="rerunning-lab-1-and-lab-2" class="level1">
+    <h1>Rerunning Lab 1 and Lab 2</h1>
+    <p><a href="../README.html">Workshop home</a> · <a href="01-lab1.html">Lab 1</a> · <a href="02-lab2.html">Lab 2</a></p>
+    <p>You can repeat both labs sequentially in this dedicated workshop environment. <strong>Do not delete experiments, training runs, model versions, source files or schemas before an ordinary rerun.</strong> The notebooks handle their own target writes, but their effects differ.</p>
+    <section id="what-each-rerun-changes" class="level2">
+    <h2>What each rerun changes</h2>
+    <table>
+    <thead>
+    <tr>
+    <th>What you run</th>
+    <th>Reused or retained</th>
+    <th>Replaced or added</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td>Lab 1A — Bronze</td>
+    <td>Source CSVs, schemas and volumes</td>
+    <td>Drops and recreates five named Bronze tables; no backups</td>
+    </tr>
+    <tr>
+    <td>Lab 1B — Silver</td>
+    <td>Bronze inputs and unrelated objects</td>
+    <td>Drops and recreates five named Silver tables; no backups</td>
+    </tr>
+    <tr>
+    <td>Lab 1C — Gold</td>
+    <td>Silver inputs, models and volumes</td>
+    <td>Drops and recreates <code>project_context</code> and <code>milestone_features</code>; no backups</td>
+    </tr>
+    <tr>
+    <td>Lab 2, starting at Task 1</td>
+    <td>Existing experiment, earlier runs/model versions and Lab 1 tables</td>
+    <td>Adds six training runs and a registered model version; overwrites <code>milestone_delay_predictions</code></td>
+    </tr>
+    <tr>
+    <td>Lab 2 Task 10 only</td>
+    <td>Selected registered model/version</td>
+    <td>Overwrites predictions without retraining or registering another version</td>
+    </tr>
+    <tr>
+    <td>Lab 2 Task 11</td>
+    <td>Identical existing PDFs</td>
+    <td>Copies missing PDFs; stops for review if existing bytes differ</td>
+    </tr>
+    <tr>
+    <td>Full four-task workflow</td>
+    <td>Source files, experiment history, models and KB objects</td>
+    <td>Performs all three Lab 1 resets, then the complete Lab 2 training/registration/scoring path</td>
+    </tr>
+    </tbody>
+    </table>
+    <p>Lab 1 recreations discard the existing target table's history and table-specific metadata. A failure between drop and write can leave that target absent. These operations are not an atomic multi-table update. Do not run other readers or writers that require a consistent workshop snapshot while rebuilding it.</p>
+    </section>
+    <section id="lab-1-choose-where-to-restart" class="level2">
+    <h2>Lab 1: choose where to restart</h2>
+    <ol type="1">
+    <li>If source CSVs or Bronze ingestion changed, run <strong>Lab 1A → Lab 1B → Lab 1C → Lab 2</strong>.</li>
+    <li>If only Silver transformations changed and Bronze is current, run <strong>Lab 1B → Lab 1C → Lab 2</strong>.</li>
+    <li>If only Gold transformations changed and Silver is current, run <strong>Lab 1C → Lab 2</strong>.</li>
+    <li>Start each notebook at its setup cell, then run the remaining cells in order. Silver also has dependencies between its table transformations.</li>
+    <li>After a failed Lab 1 write, resolve the cause, recreate the affected target by rerunning its cell, and complete dependent cells/notebooks before using the results.</li>
+    <li>Refresh the catalog and recheck row counts, outputs and native lineage. Do not assume an old graph or a previous successful run describes newly recreated tables.</li>
+    </ol>
+    <p>An upstream rerun does <strong>not</strong> refresh downstream tables automatically. Existing Gold predictions can remain visible but be out of date until Lab 2 scores the refreshed Gold data. Lab 1C does not delete the prediction table or registered model.</p>
+    </section>
+    <section id="lab-2-repeat-a-complete-walkthrough" class="level2">
+    <h2>Lab 2: repeat a complete walkthrough</h2>
+    <ol type="1">
+    <li>Confirm Lab 1's Gold inputs exist and no competing writer is running.</li>
+    <li>Start at <strong>Task 1</strong>. It reuses <code>seer_milestone_delay</code> and generates a new comparison <code>SESSION_ID</code>.</li>
+    <li>Run Tasks 2–8 in order, executing the Task 5 and Task 7 training rounds once each.</li>
+    <li>Do not rerun Task 1 between rounds. Doing so changes the session and excludes earlier candidates from the comparison.</li>
+    <li>Inspect the current notebook's three-run and six-run comparisons. The UI retains older runs, sometimes with identical names; identify current runs by run ID and session tag.</li>
+    <li>Run Task 9 once to register the selected artifact, then Task 10 to load that returned version and overwrite the predictions table.</li>
+    <li>Run Task 11 to stage the PDFs, reusing identical existing files. This completes Lab 2; there are no subsequent quality, readiness or knowledge-base tasks.</li>
+    </ol>
+    <p><strong>No prior deletion is required.</strong> The new session isolates model selection from earlier walkthroughs. Training still consumes compute, and retained run artifacts/model versions accumulate storage.</p>
+    <section id="if-a-training-round-fails-or-was-repeated" class="level3">
+    <h3>If a training round fails or was repeated</h3>
+    <p>Stop and fix the cause. If Task 5 or Task 7 created any runs, repeating the entire cell in the same session can leave extra completed candidates and fail Task 8's exact-six-run check. The simplest learner recovery is a fresh walkthrough from Task 1, running both rounds once. Previous partial/failed runs may remain for troubleshooting; do not delete them to force the comparison to pass.</p>
+    </section>
+    <section id="if-you-only-want-to-score-again" class="level3">
+    <h3>If you only want to score again</h3>
+    <p>In the same active notebook session, rerun Task 10 with its required variables still defined, including <code>REGISTERED_URI</code>, <code>MODEL_NAME</code>, <code>MODEL_VERSION</code> and <code>best_run_id</code>. It reloads the selected version and overwrites the batch predictions. Do not rerun Task 9: registration would create another version.</p>
+    <p>Task 10 is not a standalone fresh-session notebook. If the session was lost, follow the complete walkthrough, or have the instructor provide a separate inference-only setup with an explicit existing model version and its originating run. Do not substitute “latest” or guess missing values.</p>
+    </section>
+    <section id="if-registration-or-scoring-fails" class="level3">
+    <h3>If registration or scoring fails</h3>
+    <p>Check the catalog's Models → Versions list before repeating Task 9: registration might have completed even if a later step failed. If registration succeeded and its variables remain available, fix the scoring issue and rerun Task 10. Keep the model version and source-run identifiers together.</p>
+    </section>
+    </section>
+    <section id="separate-optional-knowledge-base-exercise" class="level2">
+    <h2>Separate optional knowledge-base exercise</h2>
+    <p>Reuse the Austin KB and assistant when the same PDFs and retrieval setup are intended. A new classifier version alone does not require PDF re-ingestion. Review changed documents or retrieval settings and ingest as needed; inspect the actual ingestion result. Do not repeat the creation steps for every model-training run.</p>
+    </section>
+    <section id="concurrency-and-optional-cleanup" class="level2">
+    <h2>Concurrency and optional cleanup</h2>
+    <ul>
+    <li>Run one notebook/workflow writer at a time. Workflow concurrency of one does not prevent an interactive notebook from writing simultaneously.</li>
+    <li>Keep automatic Lab 2 retries disabled. A full retry can create another group of runs and another registered version.</li>
+    <li>Cleanup is optional storage/history housekeeping, not part of the normal rerun procedure. Keep versions and source runs needed by predictions or comparisons.</li>
+    <li>Before any cleanup, identify exact lab-owned objects and their dependencies. Do not delete the catalog, schemas, source volumes, active model artifacts or unrelated resources as a reset shortcut.</li>
+    <li>Stopping between exercises does not require deleting data. Follow the setup guide's compute and idle-timeout guidance.</li>
+    </ul>
+    </section>
+    </section>
+    <footer>Locally authored adaptation of Oracle LiveLabs. Screenshots are real setup views; expected numeric outputs are local reference results. Record your own cloud execution evidence.</footer>
+  </main>
+</body>
+</html>

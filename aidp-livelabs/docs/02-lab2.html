@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lab 2: Train, compare, register, and use a milestone-delay model · Seer AIDP Workshop</title>
+  <link rel="stylesheet" href="../docs/guide.css">
+</head>
+<body>
+  <a class="skip" href="#content">Skip to lesson</a>
+  <header class="banner"><a href="../README.html">SEER / AIDP WORKSHOP</a><span>Lakehouse data → MLflow experiments → predictions</span></header>
+  <aside aria-label="Workshop navigation">
+    <p class="eyebrow">WORKSHOP GUIDE</p>
+    <nav class="chapters" aria-label="Chapters">
+      <a href="../README.html">Overview</a>
+      <a href="../docs/00-setup.html">Before you begin</a>
+      <a href="../docs/01-lab1.html">Lab 1 · Lakehouse foundation</a>
+      <a href="../docs/02-lab2.html">Lab 2 · Train, register and predict</a>
+      <a href="../docs/knowledge-base.html">Optional PDF knowledge-base extension</a>
+      <a href="../docs/workflow.html">Optional workflow execution</a>
+      <a href="../docs/learner-evidence.html">Learner evidence</a>
+    </nav>
+    <p class="eyebrow">ON THIS PAGE</p>
+    <nav class="contents" aria-label="Table of contents"><ul>
+<li><a href="#lab-2-train-compare-register-and-use-a-milestone-delay-model" id="toc-lab-2-train-compare-register-and-use-a-milestone-delay-model">Lab 2: Train, compare, register, and use a milestone-delay model</a>
+<ul>
+<li><a href="#introduction" id="toc-introduction">Introduction</a></li>
+<li><a href="#prerequisites" id="toc-prerequisites">Prerequisites</a></li>
+<li><a href="#task-1-create-the-experiment" id="toc-task-1-create-the-experiment">Task 1: Create the experiment</a></li>
+<li><a href="#task-2-prepare-labeled-teaching-history" id="toc-task-2-prepare-labeled-teaching-history">Task 2: Prepare labeled teaching history</a></li>
+<li><a href="#task-3-fix-the-data-splits" id="toc-task-3-fix-the-data-splits">Task 3: Fix the data splits</a></li>
+<li><a href="#task-4-define-run-logging" id="toc-task-4-define-run-logging">Task 4: Define run logging</a></li>
+<li><a href="#task-5-round-one--gradient-boosting" id="toc-task-5-round-one--gradient-boosting">Task 5: Round one — Gradient Boosting</a></li>
+<li><a href="#task-6-compare-round-one" id="toc-task-6-compare-round-one">Task 6: Compare round one</a></li>
+<li><a href="#task-7-round-two--decision-tree" id="toc-task-7-round-two--decision-tree">Task 7: Round two — Decision Tree</a></li>
+<li><a href="#task-8-compare-all-six-and-select-the-winner" id="toc-task-8-compare-all-six-and-select-the-winner">Task 8: Compare all six and select the winner</a></li>
+<li><a href="#task-9-register-in-the-master-catalog" id="toc-task-9-register-in-the-master-catalog">Task 9: Register in the Master Catalog</a></li>
+<li><a href="#task-10-load-the-registered-version-and-score" id="toc-task-10-load-the-registered-version-and-score">Task 10: Load the registered version and score</a></li>
+<li><a href="#task-11-stage-the-project-pdfs" id="toc-task-11-stage-the-project-pdfs">Task 11: Stage the project PDFs</a></li>
+<li><a href="#troubleshooting-and-safe-reruns" id="toc-troubleshooting-and-safe-reruns">Troubleshooting and safe reruns</a></li>
+<li><a href="#references" id="toc-references">References</a></li>
+</ul></li>
+</ul></nav>
+  </aside>
+  <main id="content">
+    <div class="edition">TWO-LAB EDITION · SEPTEMBER 2026 · PYTHON NOTEBOOKS + AIDP WORKFLOWS</div>
+    <section id="lab-2-train-compare-register-and-use-a-milestone-delay-model" class="level1">
+    <h1>Lab 2: Train, compare, register, and use a milestone-delay model</h1>
+    <p><a href="../README.html">Workshop home</a> · Previous: <a href="01-lab1.html">Lab 1</a> · Next: <a href="workflow.html">Workflow</a></p>
+    <section id="introduction" class="level2">
+    <h2>Introduction</h2>
+    <p>Train six classifiers in two rounds within one AIDP experiment, compare their validation results, register the winner in the Master Catalog, reload its explicit version and score Gold milestones. Task 11 stages the Austin PDFs in a volume; knowledge-base investigation, quality/freshness review and readiness assessment are not part of this lab.</p>
+    <p>Allow 60–90 minutes plus compute startup. Experiments and Models are AIDP Preview features.</p>
+    <section id="what-you-will-learn" class="level3">
+    <h3>What you will learn</h3>
+    <p>Create an experiment before training; log parameters, metrics and model artifacts; compare two model families; select a run using validation data; register that run's model in a catalog schema; reload a specific version and score a Gold batch. The previously optional reload-and-score exercise is included in this lab.</p>
+    <table>
+    <thead>
+    <tr>
+    <th>Stage</th>
+    <th>AIDP object or output</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td>Both training rounds</td>
+    <td>Experiment <code>seer_milestone_delay</code></td>
+    </tr>
+    <tr>
+    <td>Round one</td>
+    <td>Three Gradient Boosting runs: <code>gb_r1_1</code> to <code>gb_r1_3</code></td>
+    </tr>
+    <tr>
+    <td>Round two</td>
+    <td>Three Decision Tree runs: <code>dt_r2_1</code> to <code>dt_r2_3</code></td>
+    </tr>
+    <tr>
+    <td>Selected model</td>
+    <td><code>seer_livelabs_20260922.seer_gold.milestone_delay_classifier</code></td>
+    </tr>
+    <tr>
+    <td>Batch predictions</td>
+    <td><code>seer_livelabs_20260922.seer_gold.milestone_delay_predictions</code></td>
+    </tr>
+    <tr>
+    <td>PDF staging</td>
+    <td>Three Austin PDFs in the Gold output volume</td>
+    </tr>
+    </tbody>
+    </table>
+    </section>
+    <section id="how-to-run-this-lab" class="level3">
+    <h3>How to run this lab</h3>
+    <p>Use workspace <strong>seer_livelabs_20260922</strong>. Run one Python cell at a time, from top to bottom, and wait for completion before continuing. Task numbers are Markdown headings, not Python execution-counter numbers. There are 11 Python cells across 11 tasks. The lab ends after Task 11.</p>
+    <p>For the first walkthrough, do not choose <strong>Run all</strong>: stop after Task 6 to inspect the first round before training the second round. There is no automatic pause in the code. A workflow or Run all executes all 11 Python cells continuously.</p>
+    </section>
+    </section>
+    <section id="prerequisites" class="level2">
+    <h2>Prerequisites</h2>
+    <ol type="1">
+    <li>Finish Lab 1A, Lab 1B and Lab 1C in order.</li>
+    <li>Verify Gold contains <code>project_context</code> and <code>milestone_features</code>.</li>
+    <li>Open <strong>Shared → seer-aidp-livelabs → notebooks → Lab2_Predict_Investigate_and_Operationalize.ipynb</strong>.</li>
+    <li>Attach <strong>seer_livelabs_spark</strong>. Use AMD/Intel compute, not ARM.</li>
+    <li>Verify MLflow, scikit-learn, pandas and NumPy import successfully in Task 1. Use the platform-provided MLflow integration; do not install a replacement MLflow package or point tracking to a local folder. Round one uses scikit-learn Gradient Boosting, so no XGBoost installation is required.</li>
+    <li>Your identity needs access to workspace experiments and permission to register model versions in <code>seer_livelabs_20260922.seer_gold</code>.</li>
+    </ol>
+    <p>Only three Gold milestones are available and no labeled historical source exists. The training history is clearly marked <strong>synthetic</strong>. Scores and test metrics are educational, not validated forecasts.</p>
+    <p>The model is <strong>trained on generated history</strong>, then <strong>scores the Gold feature rows created by Lab 1C</strong>. It is not trained on the three current Gold rows or the PDFs. All model code is in the notebook; no workspace <code>lib</code> imports are needed. This revision still reads the existing <code>config/workshop.json</code>, PDF manifest—keep those supplied support files in place.</p>
+    </section>
+    <section id="task-1-create-the-experiment" class="level2">
+    <h2>Task 1: Create the experiment</h2>
+    <ol type="1">
+    <li>Run the first code cell.</li>
+    <li>It calls <code>mlflow.set_experiment("seer_milestone_delay")</code>, creating the experiment if absent and reusing it otherwise.</li>
+    <li>Note the printed experiment ID and comparison-session ID.</li>
+    <li>Open <strong>Experiments</strong> in the workspace navigation.</li>
+    <li>Open <strong>seer_milestone_delay</strong>. It may have no runs until Task 5.</li>
+    <li>Return to the notebook. Do not change the session ID between rounds.</li>
+    </ol>
+    <p>The cell also defines the registered model name, the nine features and a 0.5 evaluation threshold. Existing runs are retained.</p>
+    <p><strong>Checkpoint:</strong> the output shows an experiment ID, a comparison-session ID and library versions. The experiment ID need not be 1 in your environment. Run this setup only once per walkthrough: rerunning it changes <code>SESSION_ID</code>, so previous candidates will not appear in the new session-filtered comparison.</p>
+    </section>
+    <section id="task-2-prepare-labeled-teaching-history" class="level2">
+    <h2>Task 2: Prepare labeled teaching history</h2>
+    <ol type="1">
+    <li>Run the synthetic-history cell.</li>
+    <li>Inspect sample milestone IDs, dates and labels.</li>
+    <li>Explain that <code>late_flag = 1</code> means actual completion occurred after the planned date.</li>
+    <li>Notice that actual completion, label availability, identifiers and labels are excluded from model inputs.</li>
+    <li>The seed and generator make the 1,800-row fixture reproducible. PDFs are not used here.</li>
+    </ol>
+    <p><strong>Checkpoint:</strong> five sample rows appear with <code>SYN-</code> milestone IDs and <code>SYNTHETIC_TRAINING_ONLY</code>. These are examples for training, not new Gold tables.</p>
+    </section>
+    <section id="task-3-fix-the-data-splits" class="level2">
+    <h2>Task 3: Fix the data splits</h2>
+    <p>Run the split cell and inspect its counts:</p>
+    <table>
+    <thead>
+    <tr>
+    <th>Partition</th>
+    <th>Rule</th>
+    <th>Rows</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td>Training</td>
+    <td>Snapshot and outcome available before 2025-07-01</td>
+    <td>1,140</td>
+    </tr>
+    <tr>
+    <td>Validation</td>
+    <td>Snapshot from 2025-07-01 to 2026-01-01; outcome available before 2026-01-01</td>
+    <td>391</td>
+    </tr>
+    <tr>
+    <td>Test</td>
+    <td>Snapshot on or after 2026-01-01</td>
+    <td>183</td>
+    </tr>
+    <tr>
+    <td>Excluded</td>
+    <td>Outcome not available by the relevant training/validation boundary</td>
+    <td>86</td>
+    </tr>
+    </tbody>
+    </table>
+    <p>Both rounds use these same partitions. Average precision summarizes precision-recall performance; higher is better. Brier score measures probability error; lower is better. Precision and recall are shown at the same fixed threshold for every candidate.</p>
+    <p><strong>Checkpoint:</strong> with the supplied seed and 1,800-row configuration, the counts match this table. The 86 excluded rows are intentionally left out to prevent learning from outcomes that were unavailable at a split boundary. Do not change the partitions between training rounds.</p>
+    </section>
+    <section id="task-4-define-run-logging" class="level2">
+    <h2>Task 4: Define run logging</h2>
+    <p>Run the function-definition cell. It does not train a model yet.</p>
+    <p>Read <code>train_and_log</code>: it opens a run, logs the estimator parameters and data/split metadata, fits only training rows, evaluates validation rows, and logs a model artifact with its input signature and sample input.</p>
+    <p>The artifact's probability interface is used later for batch scoring. Model serialization/dependency files belong to MLflow-managed artifacts, not a learner <code>lib/</code> folder.</p>
+    <p><strong>Checkpoint:</strong> the cell completes without displaying a trained model. This is expected: it defines <code>train_and_log</code> and <code>compare_runs</code>; Task 5 calls them. The <code>session_id</code> tag groups this walkthrough's runs, while <code>round</code> and <code>algorithm</code> distinguish the candidates.</p>
+    </section>
+    <section id="task-5-round-one--gradient-boosting" class="level2">
+    <h2>Task 5: Round one — Gradient Boosting</h2>
+    <p>Run the three-candidate cell.</p>
+    <table>
+    <thead>
+    <tr>
+    <th>Candidate</th>
+    <th>max_depth</th>
+    <th>learning_rate</th>
+    <th>n_estimators</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td>gb_r1_1</td>
+    <td>2</td>
+    <td>0.05</td>
+    <td>60</td>
+    </tr>
+    <tr>
+    <td>gb_r1_2</td>
+    <td>3</td>
+    <td>0.10</td>
+    <td>100</td>
+    </tr>
+    <tr>
+    <td>gb_r1_3</td>
+    <td>4</td>
+    <td>0.05</td>
+    <td>120</td>
+    </tr>
+    </tbody>
+    </table>
+    <p>Each candidate gets its own run in the same experiment. All are trained from scratch.</p>
+    <p><code>max_depth</code> limits each tree's complexity; <code>learning_rate</code> controls each boosting step's contribution; <code>n_estimators</code> is the number of boosting trees. Gradient Boosting is provided by the existing scikit-learn runtime; it is not XGBoost and is not a pretrained model.</p>
+    <p><strong>Checkpoint:</strong> three printed run names, three distinct run IDs and three validation average-precision values. Allow artifact logging to finish; a completed model fit alone does not mean its run has finished.</p>
+    </section>
+    <section id="task-6-compare-round-one" class="level2">
+    <h2>Task 6: Compare round one</h2>
+    <ol type="1">
+    <li>Run the notebook comparison cell. It queries the experiment service.</li>
+    <li>In AIDP, open <strong>Experiments → seer_milestone_delay</strong> and refresh.</li>
+    <li>Use <strong>List</strong> to inspect the three run names. On repeated exercises, use tags/run details to identify this session.</li>
+    <li>Open a run to inspect Parameters, Metrics and model artifacts.</li>
+    <li>Switch to <strong>Compare</strong> to inspect the available metric charts.</li>
+    <li>Use the notebook table for the exact session-filtered comparison if the UI does not expose a tag filter.</li>
+    <li>Discuss the tradeoff between recall and precision; do not inspect the test set to decide which candidate to prefer.</li>
+    </ol>
+    <p><strong>Checkpoint:</strong> the notebook comparison has exactly three rows for this session, ranked by validation average precision. If you have run the lab before, the UI may show additional historical runs with the same names; use run IDs and the notebook's session-filtered results to distinguish them. Do not delete older runs to make the table match.</p>
+    </section>
+    <section id="task-7-round-two--decision-tree" class="level2">
+    <h2>Task 7: Round two — Decision Tree</h2>
+    <p>Return to the notebook and run the three Decision Tree candidates.</p>
+    <table>
+    <thead>
+    <tr>
+    <th>Candidate</th>
+    <th>max_depth</th>
+    <th>min_samples_leaf</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td>dt_r2_1</td>
+    <td>3</td>
+    <td>10</td>
+    </tr>
+    <tr>
+    <td>dt_r2_2</td>
+    <td>5</td>
+    <td>20</td>
+    </tr>
+    <tr>
+    <td>dt_r2_3</td>
+    <td>8</td>
+    <td>30</td>
+    </tr>
+    </tbody>
+    </table>
+    <p>Keep the same experiment and data. Refresh the experiment page: both rounds remain available together.</p>
+    <p>The three <code>gb_r1_</code> runs and three <code>dt_r2_</code> runs belong to the same experiment. Test metrics appear only on the selected winner after Task 8.</p>
+    <p><code>min_samples_leaf</code> is the minimum number of training examples in a leaf; increasing it discourages very small, highly specific branches. Unlike boosting, each Decision Tree candidate fits one tree.</p>
+    <p><strong>Checkpoint:</strong> three new run IDs are printed. Keep both rounds: do not create a second experiment or rerun Task 1 between them.</p>
+    </section>
+    <section id="task-8-compare-all-six-and-select-the-winner" class="level2">
+    <h2>Task 8: Compare all six and select the winner</h2>
+    <ol type="1">
+    <li>Run the final comparison cell.</li>
+    <li>Confirm it contains exactly the six run IDs from this exercise.</li>
+    <li>The ranking uses descending validation average precision, ascending Brier score, then run ID for stable tie-breaking.</li>
+    <li>Note the winning run ID and algorithm.</li>
+    <li>The cell loads the winning artifact and evaluates it once on the reserved test partition.</li>
+    <li>Test metrics are added to the winning run. They were not used to select the winner.</li>
+    <li>The winner can change when library versions, parameters or data change. Do not hard-code a winning algorithm.</li>
+    </ol>
+    <p><strong>Checkpoint:</strong> six rows appear in the notebook comparison, followed by the selected run ID, algorithm and test metrics. Use <code>validation_average_precision</code> for selection—not the highest recall or a test metric. The first verified run selected <code>gb_r1_1</code>; that is an illustration, not a required outcome after changing inputs.</p>
+    </section>
+    <section id="task-9-register-in-the-master-catalog" class="level2">
+    <h2>Task 9: Register in the Master Catalog</h2>
+    <ol type="1">
+    <li>Run the registration cell once.</li>
+    <li>Record the printed model name, numeric version, source run and versioned URI.</li>
+    <li>Open <strong>Master catalog → seer_livelabs_20260922 → seer_gold → Models</strong>.</li>
+    <li>Open <strong>milestone_delay_classifier</strong> and inspect its versions.</li>
+    <li>Follow the originating run to check the training parameters and metrics.</li>
+    <li>The alternative UI route is <strong>Experiments → selected run → Register</strong>. Choose the logged model and this catalog/schema. Do not also use this route after notebook registration unless you intentionally want another version.</li>
+    </ol>
+    <p>Registration stores a catalog model asset, not another Gold table. It is not production approval.</p>
+    <p>On the model page, choose <strong>Versions</strong> and use the <strong>Run</strong> link to inspect the source run. The fully qualified name includes catalog, schema and model; registering only an unqualified short name is not this exercise.</p>
+    <p><strong>Checkpoint:</strong> the printed model name matches the table above and the Versions tab contains the returned version. Version 1 in the screenshot is from the first verified execution; an existing model can return version 2 or later. Running this cell again creates another version, so do not rerun it just to refresh the UI.</p>
+    </section>
+    <section id="task-10-load-the-registered-version-and-score" class="level2">
+    <h2>Task 10: Load the registered version and score</h2>
+    <ol type="1">
+    <li>Run the load-and-score cell.</li>
+    <li>It loads <code>models:/&lt;catalog&gt;.&lt;schema&gt;.&lt;model&gt;/&lt;version&gt;</code>, not an in-memory estimator or “latest”.</li>
+    <li>An MLflow Spark UDF uses the same version to score the saved Gold milestone features.</li>
+    <li>Inspect the three predictions and the <code>model_name</code>, <code>model_version</code>, <code>model_run_id</code> and <code>scoring_run_id</code> columns.</li>
+    <li>The original Gold <code>run_id</code> remains the source-data run ID.</li>
+    <li>A bounded read-back check compares saved probabilities with the loaded model's predictions.</li>
+    <li>Inspect <code>seer_gold.milestone_delay_predictions</code> in the catalog.</li>
+    </ol>
+    <p>LOW/MEDIUM/HIGH bands are workshop conventions. An old source snapshot remains old regardless of when it was scored.</p>
+    <p><strong>Checkpoint:</strong> three persisted rows are displayed, each with the same selected model name/version and training-run ID. No read-back exception means the notebook's saved-score comparison passed. The code writes predictions from the registered model, not from the estimator left in memory after training.</p>
+    <table>
+    <thead>
+    <tr>
+    <th>Output column</th>
+    <th>Meaning</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td><code>delay_probability</code></td>
+    <td>Estimated delayed-class probability, from 0 to 1</td>
+    </tr>
+    <tr>
+    <td><code>predicted_late</code></td>
+    <td>True when probability is at least 0.5</td>
+    </tr>
+    <tr>
+    <td><code>risk_band</code></td>
+    <td>LOW below 0.4; MEDIUM from 0.4 to below 0.7; HIGH from 0.7</td>
+    </tr>
+    <tr>
+    <td><code>model_name</code>, <code>model_version</code></td>
+    <td>Catalog model and exact version used for inference</td>
+    </tr>
+    <tr>
+    <td><code>model_run_id</code></td>
+    <td>Training run that produced the selected artifact</td>
+    </tr>
+    <tr>
+    <td><code>run_id</code></td>
+    <td>Source Gold data's run identifier</td>
+    </tr>
+    <tr>
+    <td><code>scoring_run_id</code></td>
+    <td>Current notebook/workflow scoring run identifier</td>
+    </tr>
+    </tbody>
+    </table>
+    </section>
+    <section id="task-11-stage-the-project-pdfs" class="level2">
+    <h2>Task 11: Stage the project PDFs</h2>
+    <ol type="1">
+    <li>Run the PDF-staging cell after scoring.</li>
+    <li>The cell verifies the three source PDFs against the supplied manifest and copies missing files to the Austin folder. It stops for review if existing bytes differ.</li>
+    <li>Note the printed path: <code>/Volumes/seer_livelabs_20260922/seer_gold/workshop_outputs/austin-project</code>.</li>
+    <li>Open <strong>Master catalog → seer_livelabs_20260922 → seer_gold → Volumes → workshop_outputs → austin-project</strong> and confirm the three PDFs.</li>
+    </ol>
+    <p><strong>Checkpoint:</strong> the folder contains the supplier agreement, receiving inspection report and structural specification. Staging files does not create or ingest a knowledge base.</p>
+    </section>
+    <section id="troubleshooting-and-safe-reruns" class="level2">
+    <h2>Troubleshooting and safe reruns</h2>
+    <p><strong>Lab 2 can be run repeatedly, sequentially, without deleting previous experiments, runs, models or predictions first.</strong> Start at Task 1 for a complete new walkthrough. It generates a new session tag, adds six runs to the existing experiment, registers another version and overwrites the prediction table. Lab 1 inputs are read, not reset, when you run Lab 2 alone.</p>
+    <p>Run each training round once per session. Repeating Task 5 or Task 7 after it has created runs can add extra candidates and fail Task 8's exact-six-run check. After resolving a partial training failure, start a fresh walkthrough from Task 1; retain prior runs for troubleshooting. Do not rerun Task 1 between rounds.</p>
+    <table>
+    <thead>
+    <tr>
+    <th>Symptom</th>
+    <th>What to check</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td>Gold table not found</td>
+    <td>Complete Lab 1A → 1B → 1C in the same catalog before starting Lab 2.</td>
+    </tr>
+    <tr>
+    <td>Missing MLflow or scikit-learn</td>
+    <td>Check the attached runtime and setup guide. Do not replace AIDP's integrated MLflow or point tracking to a local directory.</td>
+    </tr>
+    <tr>
+    <td>Comparison is empty or lacks six runs</td>
+    <td>Check run status and whether Task 1 was rerun. For a clean walkthrough, start at Task 1 and execute both rounds once with the same session.</td>
+    </tr>
+    <tr>
+    <td>More than six runs in the UI</td>
+    <td>Previous exercises are retained. Match the current notebook's run IDs; its comparison filters on the current session.</td>
+    </tr>
+    <tr>
+    <td>Registration permission error</td>
+    <td>Verify model-create/version permissions in the intended Gold schema. Do not switch to another catalog to bypass access controls.</td>
+    </tr>
+    <tr>
+    <td>Version differs from screenshot</td>
+    <td>Expected after a rerun. Use the returned <code>MODEL_VERSION</code>, not a hard-coded 1 or “latest”.</td>
+    </tr>
+    </tbody>
+    </table>
+    <p>Repeating Task 10 in the same active notebook session, with its required setup/model variables available, reloads the selected version and overwrites predictions without retraining. It is not a standalone fresh-session cell. Repeating Task 9 creates another model version; check Models → Versions before retrying registration after an error.</p>
+    <p>Identical PDFs are reused by Task 11. No knowledge base or assistant is required. Cleanup is optional storage/history housekeeping, not a prerequisite. Keep artifacts and source runs needed for traceability.</p>
+    <p>Repeating the full workflow also resets Lab 1 tables. Avoid concurrent notebook and workflow writes. See <a href="reruns.html">complete rerun and cleanup guidance for both labs</a>.</p>
+    </section>
+    <section id="references" class="level2">
+    <h2>References</h2>
+    <ul>
+    <li><a href="https://docs.oracle.com/en/cloud/paas/ai-data-platform/aidug/experiments.html">Oracle experiments and comparison</a></li>
+    <li><a href="https://docs.oracle.com/en/cloud/paas/ai-data-platform/aidug/models.html">Oracle model registry and notebook inference</a></li>
+    </ul>
+    </section>
+    </section>
+    <footer>Locally authored adaptation of Oracle LiveLabs. Screenshots are real setup views; expected numeric outputs are local reference results. Record your own cloud execution evidence.</footer>
+  </main>
+</body>
+</html>

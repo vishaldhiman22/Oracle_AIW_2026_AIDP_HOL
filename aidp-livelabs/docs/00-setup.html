@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Before you begin: prepare the AIDP workshop · Seer AIDP Workshop</title>
+  <link rel="stylesheet" href="../docs/guide.css">
+</head>
+<body>
+  <a class="skip" href="#content">Skip to lesson</a>
+  <header class="banner"><a href="../README.html">SEER / AIDP WORKSHOP</a><span>Lakehouse data → MLflow experiments → predictions</span></header>
+  <aside aria-label="Workshop navigation">
+    <p class="eyebrow">WORKSHOP GUIDE</p>
+    <nav class="chapters" aria-label="Chapters">
+      <a href="../README.html">Overview</a>
+      <a href="../docs/00-setup.html">Before you begin</a>
+      <a href="../docs/01-lab1.html">Lab 1 · Lakehouse foundation</a>
+      <a href="../docs/02-lab2.html">Lab 2 · Train, register and predict</a>
+      <a href="../docs/knowledge-base.html">Optional PDF knowledge-base extension</a>
+      <a href="../docs/workflow.html">Optional workflow execution</a>
+      <a href="../docs/learner-evidence.html">Learner evidence</a>
+    </nav>
+    <p class="eyebrow">ON THIS PAGE</p>
+    <nav class="contents" aria-label="Table of contents"><ul>
+<li><a href="#before-you-begin-prepare-the-aidp-workshop" id="toc-before-you-begin-prepare-the-aidp-workshop">Before you begin: prepare the AIDP workshop</a>
+<ul>
+<li><a href="#introduction" id="toc-introduction">Introduction</a></li>
+<li><a href="#your-workshop-values" id="toc-your-workshop-values">Your workshop values</a></li>
+<li><a href="#prerequisites" id="toc-prerequisites">Prerequisites</a></li>
+<li><a href="#task-1-confirm-the-catalog-and-schemas" id="toc-task-1-confirm-the-catalog-and-schemas">Task 1: Confirm the catalog and schemas</a></li>
+<li><a href="#task-2-verify-the-eight-source-files" id="toc-task-2-verify-the-eight-source-files">Task 2: Verify the eight source files</a></li>
+<li><a href="#task-3-locate-the-notebooks-and-support-files" id="toc-task-3-locate-the-notebooks-and-support-files">Task 3: Locate the notebooks and support files</a></li>
+<li><a href="#task-4-inspect-compute-and-dependencies" id="toc-task-4-inspect-compute-and-dependencies">Task 4: Inspect compute and dependencies</a></li>
+<li><a href="#task-5-attach-compute-and-learn-the-notebook-controls" id="toc-task-5-attach-compute-and-learn-the-notebook-controls">Task 5: Attach compute and learn the notebook controls</a></li>
+<li><a href="#task-6-review-configuration-and-choose-your-route" id="toc-task-6-review-configuration-and-choose-your-route">Task 6: Review configuration and choose your route</a></li>
+<li><a href="#optional-recreate-the-environment-for-a-new-learner" id="toc-optional-recreate-the-environment-for-a-new-learner">Optional: recreate the environment for a new learner</a></li>
+<li><a href="#troubleshooting-and-completion" id="toc-troubleshooting-and-completion">Troubleshooting and completion</a></li>
+</ul></li>
+</ul></nav>
+  </aside>
+  <main id="content">
+    <div class="edition">TWO-LAB EDITION · SEPTEMBER 2026 · PYTHON NOTEBOOKS + AIDP WORKFLOWS</div>
+    <section id="before-you-begin-prepare-the-aidp-workshop" class="level1">
+    <h1>Before you begin: prepare the AIDP workshop</h1>
+    <p><a href="../README.html">Workshop home</a> · Next: <a href="01-lab1.html">Lab 1</a></p>
+    <section id="introduction" class="level2">
+    <h2>Introduction</h2>
+    <p>In this workshop, you play Alex, the data engineer at Seer Construction. Your project manager needs a consistent view of suppliers, purchase orders, inspections and upcoming milestones. You will build that foundation in Lab 1, then train a demonstration classifier and investigate PDF evidence in Lab 2.</p>
+    <p><strong>Estimated time:</strong> 20–30 minutes to verify the prepared environment; allow additional provisioning time for a fresh environment. Lab 1 takes approximately 45–60 minutes when following all checkpoints. Lab 2 takes approximately 90–120 minutes including the UI exercises, excluding service startup and ingestion wait time.</p>
+    <p><strong>What you will learn</strong></p>
+    <ul>
+    <li>Navigate a dedicated catalog, workspace, Spark cluster and managed volumes.</li>
+    <li>Run Python notebook cells in sequence and inspect managed Bronze, Silver and Gold tables.</li>
+    <li>Trace model predictions to the selected experiment run and registered model version.</li>
+    <li>Execute four notebooks as dependent tasks in an AIDP workflow.</li>
+    </ul>
+    <blockquote>
+    <p><strong>Current edition:</strong> Lab 1 is split into Bronze, Silver and Gold notebooks. Lab 2 is the fourth notebook. The catalog/schema locations are unchanged; the four-task workflow completed with native Success. Earlier screenshots show previous notebook/task names where noted.</p>
+    </blockquote>
+    </section>
+    <section id="your-workshop-values" class="level2">
+    <h2>Your workshop values</h2>
+    <p>Use these exact values in the prepared environment. If an instructor gives you a separate learner environment, replace the catalog/workspace and paths consistently.</p>
+    <table>
+    <thead>
+    <tr>
+    <th>Setting</th>
+    <th>Value</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td>OCI region</td>
+    <td>US Midwest (Chicago), <code>us-chicago-1</code></td>
+    </tr>
+    <tr>
+    <td>Workbench display name</td>
+    <td>Your AIDP workbench</td>
+    </tr>
+    <tr>
+    <td>Catalog and workspace</td>
+    <td><code>seer_livelabs_20260922</code></td>
+    </tr>
+    <tr>
+    <td>Spark cluster</td>
+    <td><code>seer_livelabs_spark</code></td>
+    </tr>
+    <tr>
+    <td>Schemas</td>
+    <td><code>seer_bronze</code>, <code>seer_silver</code>, <code>seer_gold</code></td>
+    </tr>
+    <tr>
+    <td>Source volume</td>
+    <td><code>seer_livelabs_20260922.seer_bronze.source_files</code></td>
+    </tr>
+    <tr>
+    <td>Output volume</td>
+    <td><code>seer_livelabs_20260922.seer_gold.workshop_outputs</code></td>
+    </tr>
+    <tr>
+    <td>Package filesystem root</td>
+    <td><code>/Workspace/Shared/seer-aidp-livelabs</code></td>
+    </tr>
+    <tr>
+    <td>Workflow display name</td>
+    <td><code>seer_aidp_labs</code></td>
+    </tr>
+    </tbody>
+    </table>
+    <p>Use the workbench OCID, workspace key and cluster key from your own AIDP environment. This public repository supplies no live connection details. Create the example resource names above, or replace them consistently throughout the notebook setup cells and configuration.</p>
+    </section>
+    <section id="prerequisites" class="level2">
+    <h2>Prerequisites</h2>
+    <ol type="1">
+    <li>Sign in to the supplied OCI tenancy and open its AIDP workbench in Chrome.</li>
+    <li>Confirm that your identity can read the source volume, create/update tables in the three workshop schemas, write the output volume, and use the dedicated workspace/cluster.</li>
+    <li>Knowledge-base and agent permissions are not required for Lab 2 Tasks 1–11. The separate optional PDF knowledge-base guide has additional prerequisites.</li>
+    <li>The five CSVs and three sample PDFs are included at the repository root. Keep them available locally for upload to your source volume.</li>
+    <li>Obtain approval for your environment's compute usage before starting it. A 30-minute idle timeout reduces unattended runtime; it is not a spending cap.</li>
+    </ol>
+    <p>No ALH database login, ONNX runtime or GPU is required. Lab 1 uses Spark DataFrames and Spark SQL. Lab 2 uses the platform's MLflow integration and scikit-learn to train Gradient Boosting and Decision Tree classifiers on the driver, compare six experiment runs, register the winner, and reload its explicit version for batch scoring through a Spark UDF. It saves only predictions as a Gold table; no quality/freshness review or summary-generation task is included. Do not apply this bounded driver-side training implementation to production-scale data.</p>
+    </section>
+    <section id="task-1-confirm-the-catalog-and-schemas" class="level2">
+    <h2>Task 1: Confirm the catalog and schemas</h2>
+    <ol type="1">
+    <li>In the workbench's left navigation, click <strong>Master catalog</strong>.</li>
+    <li>In the catalog list, click <strong>seer_livelabs_20260922</strong>.</li>
+    <li>On <strong>Schemas</strong>, find <strong>seer_bronze</strong>, <strong>seer_silver</strong> and <strong>seer_gold</strong>.</li>
+    <li>Check that each schema is Active. The automatically created <code>default</code> schema is not used by these notebooks.</li>
+    <li>Leave existing unrelated catalogs unchanged.</li>
+    </ol>
+    <p><strong>Checkpoint:</strong> You can open all three schemas. An empty Tables listing before Lab 1 is expected.</p>
+    </section>
+    <section id="task-2-verify-the-eight-source-files" class="level2">
+    <h2>Task 2: Verify the eight source files</h2>
+    <ol type="1">
+    <li>From the catalog, open <strong>seer_bronze</strong>.</li>
+    <li>In <strong>Types</strong>, click <strong>Volumes</strong>, then <strong>source_files</strong>.</li>
+    <li>Select <strong>Folders and Files</strong>.</li>
+    <li>Verify these eight flat filenames. Do not rename them or add a second nested copy.</li>
+    </ol>
+    <table>
+    <thead>
+    <tr>
+    <th>Filename</th>
+    <th>Expected contents</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td><code>source-data_suppliers_supplier_extract.csv</code></td>
+    <td>8 supplier records</td>
+    </tr>
+    <tr>
+    <td><code>source-data_assets_financial_assets.csv</code></td>
+    <td>3 asset records</td>
+    </tr>
+    <tr>
+    <td><code>source-data_purchasing_purchase_orders.csv</code></td>
+    <td>4 purchase orders</td>
+    </tr>
+    <tr>
+    <td><code>source-data_schedules_project_milestones.csv</code></td>
+    <td>4 milestones</td>
+    </tr>
+    <tr>
+    <td><code>source-data_inspections_inspection_findings.csv</code></td>
+    <td>4 inspection records</td>
+    </tr>
+    <tr>
+    <td><code>documents_atlas_supplier_framework_agreement.pdf</code></td>
+    <td>1 page</td>
+    </tr>
+    <tr>
+    <td><code>documents_austin_receiving_inspection_report.pdf</code></td>
+    <td>1 page</td>
+    </tr>
+    <tr>
+    <td><code>documents_austin_structural_engineering_specification.pdf</code></td>
+    <td>3 pages</td>
+    </tr>
+    </tbody>
+    </table>
+    <ol start="5" type="1">
+    <li>If a file is missing in a fresh environment, use the volume's <strong>Actions</strong> upload option and select that original file. Inspect the destination before submitting. Do not replace an existing different version without review.</li>
+    <li>Compare names and hashes with <a href="../reference/source-assets.json">source-assets.json</a>. Lab 1 no longer includes a source-inventory task.</li>
+    <li>Leave <code>models_all_MiniLM_L12_v2.onnx</code> local. The native knowledge base handles embeddings; this edition does not upload that model.</li>
+    </ol>
+    <p>The notebook filesystem path is:</p>
+    <pre class="text"><code>/Volumes/seer_livelabs_20260922/seer_bronze/source_files</code></pre>
+    <p><strong>Checkpoint:</strong> Eight files, five CSV feeds, 23 total CSV rows, five PDF pages. Do not count the header as a data row.</p>
+    </section>
+    <section id="task-3-locate-the-notebooks-and-support-files" class="level2">
+    <h2>Task 3: Locate the notebooks and support files</h2>
+    <ol type="1">
+    <li><p>Click <strong>Workspaces</strong> and open <strong>seer_livelabs_20260922</strong>.</p></li>
+    <li><p>Open <strong>Shared → seer-aidp-livelabs → notebooks</strong>.</p></li>
+    <li><p>Confirm that all four rows have Type <strong>Notebook</strong>, not simply File.</p></li>
+    <li><p>Keep this folder available; you will open Lab 1 from here.</p></li>
+    <li><p>Return one folder level to <strong>seer-aidp-livelabs</strong>. Verify the support folders:</p></li>
+    </ol>
+    <pre class="text"><code>seer-aidp-livelabs/
+  config/
+    workshop.json
+  reference/
+    project_context_contract.json
+    pdf-manifest.json
+  notebooks/
+    Lab1A_Bronze_Ingestion.ipynb
+    Lab1B_Silver_Transformations.ipynb
+    Lab1C_Gold_Project_Data.ipynb
+    Lab2_Predict_Investigate_and_Operationalize.ipynb
+  seer_aidp_labs.job</code></pre>
+    <p>For a fresh import, create the folders first, upload ordinary support files into their matching folders, and import the IPYNBs as notebooks. Keep the folder structure intact. The native notebook metadata may report <code>Workspace/Shared/...</code> without the leading slash; Python filesystem reads use <code>/Workspace/Shared/...</code>.</p>
+    <p><strong>Checkpoint:</strong> All four notebooks open with multiple Markdown/code cells: Bronze has 7 code cells, Silver 7, Gold 3, and Lab 2 has 12. All contain their own Python logic, without workspace library imports. An empty text editor or one large JSON cell indicates an incorrect import.</p>
+    </section>
+    <section id="task-4-inspect-compute-and-dependencies" class="level2">
+    <h2>Task 4: Inspect compute and dependencies</h2>
+    <ol type="1">
+    <li><p>Confirm the workspace selector in the left navigation shows <strong>seer_livelabs_20260922</strong>.</p></li>
+    <li><p>Click <strong>Compute</strong>, then the <strong>Clusters</strong> tab.</p></li>
+    <li><p>Open <strong>seer_livelabs_spark</strong>.</p></li>
+    <li><p>On <strong>Details</strong>, verify Spark 3.5.0, an AMD driver with 2 OCPUs/16 GB, one AMD worker with 2 OCPUs/16 GB, and idle timeout 30 minutes.</p></li>
+    <li><p>If the cluster is stopped, start it only when you are ready to execute the lab and authorized to incur runtime charges. Wait for Active before running notebook cells.</p></li>
+    <li><p>For Lab 2, check MLflow, scikit-learn, pandas and NumPy. Keep AIDP's integrated MLflow package and authentication. The checked runtime provides MLflow 3.12.0, scikit-learn 1.8.0, pandas 2.2.3 and NumPy 2.4.6. No learner requirements file or XGBoost package is needed. PDF staging needs no PDF parser.</p></li>
+    <li><p>If a package is absent, use your administrator-approved cluster library installation method. Apply the requirements to the runtime used by both interactive notebooks and workflow tasks, and restart only if the library installer requires it.</p></li>
+    <li><p>In the first notebook, use a temporary Python cell to check the runtime after attaching compute:</p></li>
+    </ol>
+    <div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas, numpy, sklearn, mlflow</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(sys.version)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;pandas&quot;</span>, pandas.__version__)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;numpy&quot;</span>, numpy.__version__)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;scikit-learn&quot;</span>, sklearn.__version__)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;MLflow&quot;</span>, mlflow.__version__)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>root <span class="op">=</span> Path(<span class="st">&quot;/Workspace/Shared/seer-aidp-livelabs&quot;</span>)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> (root <span class="op">/</span> <span class="st">&quot;reference/pdf-manifest.json&quot;</span>).is_file()</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> (root <span class="op">/</span> <span class="st">&quot;config/workshop.json&quot;</span>).is_file()</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> (root <span class="op">/</span> <span class="st">&quot;reference/pdf-manifest.json&quot;</span>).is_file()</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> Path(<span class="st">&quot;/Volumes/seer_livelabs_20260922/seer_bronze/source_files&quot;</span>).is_dir()</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="st">&quot;spark&quot;</span> <span class="kw">in</span> <span class="bu">globals</span>(), <span class="st">&quot;Attach the dedicated Spark cluster.&quot;</span></span></code></pre></div>
+    <p>Do not set <code>SEER_LOCAL_TEST=1</code> in AIDP. That flag bypasses Spark persistence and is only for offline package tests. Do not put credentials in a notebook cell.</p>
+    </section>
+    <section id="task-5-attach-compute-and-learn-the-notebook-controls" class="level2">
+    <h2>Task 5: Attach compute and learn the notebook controls</h2>
+    <ol type="1">
+    <li><p>Open <strong>Lab1A_Bronze_Ingestion.ipynb</strong>.</p></li>
+    <li><p>At the upper right, click <strong>Cluster → Attach existing cluster</strong>.</p></li>
+    <li><p>Choose <strong>seer_livelabs_spark</strong>. Verify the attached-cluster label changes from <strong>No cluster attached</strong> to the workshop cluster.</p></li>
+    <li><p>If the cluster is missing, check the selected workspace and your compute permissions before creating another cluster.</p></li>
+    <li><p>Read each Markdown task, select its following Python code cell, and use <strong>Run → Run selected cell(s)</strong>. The cell-level play control is also available when the cell is selected. Wait for output or an error before moving on.</p></li>
+    <li><p>Use <strong>Run all</strong> only after understanding the notebook. In Lab 2's first interactive pass, pause after Task 6 to compare the first round, and finish after Task 11. The code does not pause automatically.</p></li>
+    <li><p>Do not run later cells after an earlier failure. For Lab 1, fix the root cause and rebuild the affected target and downstream dependencies. For a partially completed Lab 2 training round, start a fresh session from Task 1 and run both rounds once; blindly repeating the round can create extra candidates. Before repeating registration, check whether it already created a version.</p></li>
+    <li><p>Gold and Lab 2 default to run ID <code>interactive</code>. Workflow tasks receive the shared native job run ID. There is no <code>Lab</code> object in the learner notebooks.</p></li>
+    </ol>
+    </section>
+    <section id="task-6-review-configuration-and-choose-your-route" class="level2">
+    <h2>Task 6: Review configuration and choose your route</h2>
+    <ol type="1">
+    <li>Open <a href="../config/workshop.json">config/workshop.json</a> or its uploaded workspace copy.</li>
+    <li>Verify catalog, schema names and both volume paths against this guide.</li>
+    <li>Retain <code>source_layout: "flat"</code>. Use <code>"nested"</code> only for the original bucket's nested directory layout, with matching files.</li>
+    <li>Keep the historical fixture clock <code>2026-07-14T01:00:00+00:00</code>. It controls which upcoming milestones are selected; it does not make the sources current.</li>
+    <li>Training and evaluation remain synthetic demonstrations; the current labs do not use the legacy <code>fail_on_not_ready</code> setting.</li>
+    <li>No KB attestation file is required. Inspect ingestion status directly in AIDP during Lab 2.</li>
+    </ol>
+    <p>Follow this sequence:</p>
+    <ol type="1">
+    <li>Complete <a href="01-lab1.html">Lab 1</a>, running Bronze, Silver and both Gold writes.</li>
+    <li>Complete Lab 2 Tasks 1–11.</li>
+    <li>Complete Lab 2 after Task 11 stages the PDFs. No KB, quality/freshness or readiness tasks are required.</li>
+    <li>Optionally use the separate <a href="workflow.html">workflow execution guide</a> to automate the four notebooks. It is not a Lab 2 task.</li>
+    </ol>
+    </section>
+    <section id="optional-recreate-the-environment-for-a-new-learner" class="level2">
+    <h2>Optional: recreate the environment for a new learner</h2>
+    <p>This is not necessary to repeat the labs. Reuse the prepared environment and follow <a href="reruns.html">rerun guidance for Lab 1 and Lab 2</a>; do not delete existing experiments or model versions first.</p>
+    <p>Skip this section in the prepared workspace. Use unique instructor-approved names; do not overwrite the existing catalog.</p>
+    <ol type="1">
+    <li>In <strong>Master catalog</strong>, choose <strong>Create catalog</strong>, select a standard catalog, and create your learner catalog.</li>
+    <li>Open it and use <strong>Create schema</strong> for the Bronze, Silver and Gold schema names above.</li>
+    <li>Within Bronze, use <strong>Add to schema</strong> to create a managed volume named <code>source_files</code>. In Gold, create a managed volume named <code>workshop_outputs</code>.</li>
+    <li>In <strong>Workspaces</strong>, create a workspace and select your new standard catalog as its default catalog.</li>
+    <li>Select that workspace, open <strong>Compute</strong>, and create a Spark cluster using the sizing and idle timeout in Task 4. Record the new cluster key rather than reusing the prepared key.</li>
+    <li>Upload/import the data and code using Tasks 2–3. Update <code>config/workshop.json</code> and the cluster environment variable <code>SEER_LAB_HOME</code> if your package root differs.</li>
+    <li>Create the four-task job using the <a href="workflow.html">workflow guide</a>, with your notebook paths and cluster.</li>
+    <li>Repeat all setup checkpoints before running Lab 1. Ask an administrator for missing privileges; do not grant broad access as a shortcut.</li>
+    </ol>
+    <p>For UI variations, consult Oracle's <a href="https://docs.oracle.com/en/cloud/paas/ai-data-platform/aidug/notebooks.html">notebook guide</a>, <a href="https://docs.oracle.com/en/cloud/paas/ai-data-platform/aidug/volumes.html">volume guide</a>, and <a href="https://docs.oracle.com/en/cloud/paas/ai-data-platform/aidug/get-started-oracle-ai-data-platform.html">AI prerequisites</a>.</p>
+    </section>
+    <section id="troubleshooting-and-completion" class="level2">
+    <h2>Troubleshooting and completion</h2>
+    <table>
+    <thead>
+    <tr>
+    <th>Symptom</th>
+    <th>Check and next action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td>Cluster not listed in attachment menu</td>
+    <td>Select the dedicated workspace; inspect Compute and permissions.</td>
+    </tr>
+    <tr>
+    <td><code>ModuleNotFoundError: seer_runtime</code></td>
+    <td>Reopen the updated notebook: neither current lab imports workshop libraries. Configuration/reference files are still required.</td>
+    </tr>
+    <tr>
+    <td>Missing MLflow/scikit-learn/pandas/NumPy</td>
+    <td>Complete the runtime check; use approved cluster libraries. Preserve AIDP's integrated MLflow; do not replace it with a local file tracker.</td>
+    </tr>
+    <tr>
+    <td>File not found under <code>/Volumes</code></td>
+    <td>Compare catalog/schema/volume, flat filename and source layout.</td>
+    </tr>
+    <tr>
+    <td>Tables not visible</td>
+    <td>Finish the producing cell, then refresh the schema's Tables listing.</td>
+    </tr>
+    <tr>
+    <td>Permission denied</td>
+    <td>Request the specific missing read/write/use privilege; don't switch to unrelated privileged resources.</td>
+    </tr>
+    <tr>
+    <td>AI features unavailable</td>
+    <td>Complete the data/ML path and record KB/agent steps as not performed.</td>
+    </tr>
+    </tbody>
+    </table>
+    <p>You are ready for <a href="01-lab1.html">Lab 1</a> when all four notebooks, all support files, eight source files, three schemas and the dedicated runtime are accessible. Review the <a href="learner-evidence.html">workshop checkpoints</a>.</p>
+    </section>
+    </section>
+    <footer>Locally authored adaptation of Oracle LiveLabs. Screenshots are real setup views; expected numeric outputs are local reference results. Record your own cloud execution evidence.</footer>
+  </main>
+</body>
+</html>

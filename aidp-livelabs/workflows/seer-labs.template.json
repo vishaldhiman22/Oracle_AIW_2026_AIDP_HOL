@@ -1,0 +1,120 @@
+{
+  "name": "seer_aidp_labs.job",
+  "description": "Four notebook tasks: Bronze CSV ingestion, Silver transformations, Gold context/features, MLflow milestone predictions and PDF staging.",
+  "path": "__WORKSPACE_FOLDER__/seer_aidp_labs.job",
+  "maxConcurrentRuns": 1,
+  "timeoutSeconds": 5400,
+  "jobClusters": [
+    {
+      "clusterKey": "__CLUSTER_KEY__",
+      "clusterName": "__CLUSTER_NAME__"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "config_path",
+      "value": "__CONFIG_PATH__"
+    }
+  ],
+  "tasks": [
+    {
+      "type": "NOTEBOOK_TASK",
+      "taskKey": "lab1_bronze",
+      "runIf": "ALL_SUCCESS",
+      "dependsOn": [],
+      "source": "WORKSPACE",
+      "notebookPath": "__WORKSPACE_FOLDER__/notebooks/Lab1A_Bronze_Ingestion.ipynb",
+      "cluster": {
+        "clusterKey": "__CLUSTER_KEY__",
+        "clusterName": "__CLUSTER_NAME__"
+      },
+      "maxRetries": 1,
+      "minRetryIntervalMillis": 30000,
+      "isRetryOnTimeout": false,
+      "timeoutSeconds": 1800,
+      "parameters": [
+        {
+          "name": "run_id",
+          "value": "{{job.run_id}}"
+        }
+      ]
+    },
+    {
+      "type": "NOTEBOOK_TASK",
+      "taskKey": "lab1_silver",
+      "runIf": "ALL_SUCCESS",
+      "dependsOn": [
+        {
+          "taskKey": "lab1_bronze"
+        }
+      ],
+      "source": "WORKSPACE",
+      "notebookPath": "__WORKSPACE_FOLDER__/notebooks/Lab1B_Silver_Transformations.ipynb",
+      "cluster": {
+        "clusterKey": "__CLUSTER_KEY__",
+        "clusterName": "__CLUSTER_NAME__"
+      },
+      "maxRetries": 1,
+      "minRetryIntervalMillis": 30000,
+      "isRetryOnTimeout": false,
+      "timeoutSeconds": 1800,
+      "parameters": [
+        {
+          "name": "run_id",
+          "value": "{{job.run_id}}"
+        }
+      ]
+    },
+    {
+      "type": "NOTEBOOK_TASK",
+      "taskKey": "lab1_gold",
+      "runIf": "ALL_SUCCESS",
+      "dependsOn": [
+        {
+          "taskKey": "lab1_silver"
+        }
+      ],
+      "source": "WORKSPACE",
+      "notebookPath": "__WORKSPACE_FOLDER__/notebooks/Lab1C_Gold_Project_Data.ipynb",
+      "cluster": {
+        "clusterKey": "__CLUSTER_KEY__",
+        "clusterName": "__CLUSTER_NAME__"
+      },
+      "maxRetries": 1,
+      "minRetryIntervalMillis": 30000,
+      "isRetryOnTimeout": false,
+      "timeoutSeconds": 1800,
+      "parameters": [
+        {
+          "name": "run_id",
+          "value": "{{job.run_id}}"
+        }
+      ]
+    },
+    {
+      "type": "NOTEBOOK_TASK",
+      "taskKey": "lab2_predict_and_assess",
+      "runIf": "ALL_SUCCESS",
+      "dependsOn": [
+        {
+          "taskKey": "lab1_gold"
+        }
+      ],
+      "source": "WORKSPACE",
+      "notebookPath": "__WORKSPACE_FOLDER__/notebooks/Lab2_Predict_Investigate_and_Operationalize.ipynb",
+      "cluster": {
+        "clusterKey": "__CLUSTER_KEY__",
+        "clusterName": "__CLUSTER_NAME__"
+      },
+      "maxRetries": 0,
+      "isRetryOnTimeout": false,
+      "timeoutSeconds": 3600,
+      "parameters": [
+        {
+          "name": "run_id",
+          "value": "{{job.run_id}}"
+        }
+      ]
+    }
+  ]
+}

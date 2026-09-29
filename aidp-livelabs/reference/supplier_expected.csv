@@ -1,0 +1,9 @@
+source_record_id,canonical_supplier_name,qualification_status,normalized_certification,normalized_location
+CRM-SUP-1001,Atlas Structural Fabrication,APPROVED,AISC,"AUSTIN, TX"
+ERP-VEN-2044,Atlas Structural Fabrication,APPROVED,AISC,"AUSTIN, TX"
+CRM-SUP-1002,Westbridge Steel Supply,REQUEST_INFORMATION,MISSING,"DALLAS, TX"
+ERP-VEN-2071,Westbridge Steel Supply,APPROVED,AISC,"DALLAS, TX"
+CRM-SUP-1003,Northline Industrial Metals,REVIEW_REQUIRED,AWS D1.1,"SAN ANTONIO, TX"
+ERP-VEN-2099,Precision Air Systems,APPROVED,ISO 9001,"ROUND ROCK, TX"
+CRM-SUP-1004,Coastal Retrofit Metals,REQUEST_INFORMATION,MISSING,"GALVESTON, TX"
+CRM-SUP-1005,Civic Steel Partners,APPROVED,AISC,"HOUSTON, TX"
