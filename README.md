@@ -1,4 +1,4 @@
-# Oracle_AIW_2026_AIDP_HOL
+# Oracle AI World 2026: AIDP Hands-on Labs
 
 Hands-on Oracle AI Data Platform labs for a sample construction-project lakehouse and MLflow model lifecycle.
 
@@ -7,9 +7,39 @@ Hands-on Oracle AI Data Platform labs for a sample construction-project lakehous
 1. [Lab 1A: Bronze ingestion](aidp-livelabs/notebooks/Lab1A_Bronze_Ingestion.ipynb): load five CSV feeds into Delta tables.
 2. [Lab 1B: Silver transformations](aidp-livelabs/notebooks/Lab1B_Silver_Transformations.ipynb): standardize suppliers and reconcile project data.
 3. [Lab 1C: Gold project data](aidp-livelabs/notebooks/Lab1C_Gold_Project_Data.ipynb): build project context with Spark SQL and milestone features.
-4. [Lab 2: MLflow lifecycle](aidp-livelabs/notebooks/Lab2_Predict_Investigate_and_Operationalize.ipynb): train six candidates, compare runs, register the winner, reload its version, and score Gold data. Task 11 stages three PDFs; Tasks 12 onward have been removed.
+4. [Lab 2: MLflow lifecycle](aidp-livelabs/notebooks/Lab2_Predict_Investigate_and_Operationalize.ipynb): train six candidates, compare runs, register the winner, reload its version, and score Gold data. The lab ends at Task 11, which stages three PDFs.
 
 Start with the [setup guide](aidp-livelabs/docs/00-setup.md), then follow the [Lab 1](aidp-livelabs/docs/01-lab1.md) and [Lab 2](aidp-livelabs/docs/02-lab2.md) instructions. The [workflow](aidp-livelabs/docs/workflow.md) and [knowledge-base](aidp-livelabs/docs/knowledge-base.md) guides are separate optional extensions.
+
+## Quick start
+
+```bash
+git clone https://github.com/vishaldhiman22/Oracle_AIW_2026_AIDP_HOL.git
+cd Oracle_AIW_2026_AIDP_HOL
+```
+
+1. Follow the setup guide to prepare your own AIDP environment and upload the source files below. Keep their filenames unchanged.
+2. Import the four `.ipynb` files from `aidp-livelabs/notebooks/` as AIDP notebooks, and upload the configuration and reference JSON files to the corresponding workspace folders.
+3. Attach your Spark cluster and run **Lab 1A → Lab 1B → Lab 1C → Lab 2**. These are AIDP/Spark notebooks, not standalone local Python scripts.
+4. In Lab 2, run one cell at a time and pause after Task 6 to compare the first three runs before training the next three. Run each training round once per comparison session.
+5. Register the selected model, reload its explicit version, score the Gold milestones, and finish with PDF staging in Task 11. Knowledge-base creation and agent testing are not required for the MLflow lab.
+
+## Included sample inputs
+
+All five CSV files and three project PDFs are included at the repository root. No separate bucket download is required for these inputs.
+
+| Input | Purpose |
+| --- | --- |
+| [Supplier extract](source-data_suppliers_supplier_extract.csv) | Supplier standardization and reconciliation |
+| [Financial assets](source-data_assets_financial_assets.csv) | Asset and project context |
+| [Purchase orders](source-data_purchasing_purchase_orders.csv) | Procurement status and committed costs |
+| [Project milestones](source-data_schedules_project_milestones.csv) | Milestone dates and status |
+| [Inspection findings](source-data_inspections_inspection_findings.csv) | Inspection context |
+| [Supplier framework agreement](documents_atlas_supplier_framework_agreement.pdf) | Project document staged in Task 11 |
+| [Austin receiving inspection report](documents_austin_receiving_inspection_report.pdf) | Project document staged in Task 11 |
+| [Austin structural specification](documents_austin_structural_engineering_specification.pdf) | Project document staged in Task 11 |
+
+The classifier is trained on generated synthetic history, not on these PDFs or the three current Gold rows. It then scores the Gold feature rows produced by Lab 1C. File hashes are supplied in [the source manifest](aidp-livelabs/reference/source-assets.json).
 
 ## Bring your own AIDP environment
 
