@@ -46,7 +46,7 @@ Alternatively, use GitHub's **Code → Download ZIP** and extract it.
 
 ### Included source inputs
 
-All eight sample inputs are in the [`data/`](data/) folder. No separate bucket download is required. Keep their filenames unchanged when uploading.
+All five CSV inputs are in the [`data/`](data/) folder. No separate bucket download is required. Keep their filenames unchanged when uploading.
 
 | Input | Purpose |
 | --- | --- |
@@ -55,19 +55,14 @@ All eight sample inputs are in the [`data/`](data/) folder. No separate bucket d
 | [Purchase orders](data/source-data_purchasing_purchase_orders.csv) | Procurement status and committed costs |
 | [Project milestones](data/source-data_schedules_project_milestones.csv) | Milestone dates and status |
 | [Inspection findings](data/source-data_inspections_inspection_findings.csv) | Inspection context |
-| [Supplier framework agreement](data/documents_atlas_supplier_framework_agreement.pdf) | Optional project document; not used by the current notebooks |
-| [Austin receiving inspection report](data/documents_austin_receiving_inspection_report.pdf) | Optional project document; not used by the current notebooks |
-| [Austin structural specification](data/documents_austin_structural_engineering_specification.pdf) | Optional project document; not used by the current notebooks |
 
-The CSVs contain 23 data rows in total; the three PDFs contain five pages in total.
+The CSVs contain 23 data rows in total.
 
 ### Required workspace files
 
 Only five files are required in the AIDP workspace: the four notebooks and [config/workshop.json](aidp-livelabs/config/workshop.json), read by every notebook.
 
-The existing [PDF manifest](aidp-livelabs/reference/pdf-manifest.json) and sample PDFs remain in the repository, but are optional assets: the current notebooks no longer read or stage PDFs.
-
-The CSV inputs belong in a **volume**, not in the notebook folder. The optional [workflow template](aidp-livelabs/workflows/seer-labs.template.json) is not a notebook runtime dependency.
+The CSV inputs belong in a **volume**, not in the notebook folder. The notebooks do not require PDFs, a reference folder or a workflow template.
 
 ## Prepare your AIDP environment
 
@@ -95,7 +90,7 @@ Create the workspace and Spark cluster. The prepared workshop used Spark 3.5.0 o
 ### 2. Upload the source data
 
 1. Open **Master catalog → your catalog → seer_bronze → Volumes → source_files**.
-2. Upload the five CSV files from the repository's `data/` folder directly to the volume root. Do not upload the `data` folder itself, rename files, or add a second nesting folder. The three PDFs are optional.
+2. Upload the five CSV files from the repository's `data/` folder directly to the volume root. Do not upload the `data` folder itself, rename files, or add a second nesting folder.
 3. Confirm all five CSV filenames match the repository.
 4. In `config/workshop.json`, confirm `source_layout` is `flat` and the paths match your volumes:
    - `source_root`: `/Volumes/seer_livelabs_20260922/seer_bronze/source_files`
@@ -286,8 +281,6 @@ After completing the interactive labs, optionally automate the four notebooks in
 8. Verify table counts, model registration, predictions and actual lineage in your environment.
 
 Workflow concurrency does not block simultaneous interactive notebook writes. A complete workflow run repeats the Lab 1 resets and Lab 2 training/registration; it is not equivalent to scoring only. It does not pause for comparisons or ingest a knowledge base.
-
-For API-based job creation, the optional [workflow template](aidp-livelabs/workflows/seer-labs.template.json) contains the same task configuration. Replace `__CLUSTER_KEY__`, `__CLUSTER_NAME__`, `__WORKSPACE_FOLDER__` and `__CONFIG_PATH__` with your values before submitting it through your approved AIDP tooling. Editing the file does not create or execute a job.
 
 ## Troubleshooting
 
