@@ -2,6 +2,8 @@
 
 Build a construction-project lakehouse, then train and use a milestone-delay classifier with Oracle AI Data Platform (AIDP) and MLflow.
 
+Notebook source was synchronized from the workbench on **September 30, 2026**. This is a source export, not a new successful execution claim.
+
 This README is the single learner guide. Detailed explanations and task instructions are also embedded in the four notebooks. No separate `docs/`, `tools/`, or support Python library is required.
 
 ## Contents
@@ -24,14 +26,14 @@ Run the notebooks in this order:
 | --- | --- | --- |
 | [Lab 1A: Bronze ingestion](aidp-livelabs/notebooks/Lab1A_Bronze_Ingestion.ipynb) | Import five source CSVs | Five Bronze Delta tables |
 | [Lab 1B: Silver transformations](aidp-livelabs/notebooks/Lab1B_Silver_Transformations.ipynb) | Standardize suppliers and reconcile project data | Five Silver Delta tables |
-| [Lab 1C: Gold project data](aidp-livelabs/notebooks/Lab1C_Gold_Project_Data.ipynb) | Build project context with Spark SQL and milestone features with PySpark | Two Gold Delta tables |
-| [Lab 2: MLflow lifecycle](aidp-livelabs/notebooks/Lab2_Predict_Investigate_and_Operationalize.ipynb) | Train six candidates, compare, register, reload, score and stage PDFs | One experiment, model versions, one predictions table and staged PDFs |
+| [Lab 1C: Gold project data](aidp-livelabs/notebooks/Lab1C_Gold_Project_Data.ipynb) | Build project context, features, known outcomes and training rows | Four Gold Delta tables |
+| [Lab 2: MLflow lifecycle](aidp-livelabs/notebooks/Lab2_Predict_Investigate_and_Operationalize.ipynb) | Train six candidates, compare, register, reload and score | One experiment, model versions and displayed predictions |
 
 Lab 1 takes approximately 45–60 minutes and Lab 2 approximately 60–90 minutes, excluding provisioning and compute startup.
 
-**Use a dedicated learning environment. Lab 1 drops and recreates its 12 named tables without backups.** Do not point the notebooks at production tables or run concurrent writers.
+**Use a dedicated learning environment. Lab 1 drops and recreates its 14 named tables without backups.** Do not point the notebooks at production tables or run concurrent writers.
 
-The source files are teaching fixtures. Lab 2 generates synthetic labeled history for training; it does not train on the PDFs or the three current Gold rows. Metrics and predictions are educational, not production forecasts.
+The source files are teaching fixtures. Lab 2 now trains from `seer_gold.milestone_training`, not generated synthetic history or PDFs. Gold training combines status-derived proxy labels with available completion outcomes. Metrics and predictions demonstrate MLflow functionality, not validated delay forecasting.
 
 ## Get the files
 
@@ -53,20 +55,19 @@ All eight files below are at the repository root. No separate bucket download is
 | [Purchase orders](source-data_purchasing_purchase_orders.csv) | Procurement status and committed costs |
 | [Project milestones](source-data_schedules_project_milestones.csv) | Milestone dates and status |
 | [Inspection findings](source-data_inspections_inspection_findings.csv) | Inspection context |
-| [Supplier framework agreement](documents_atlas_supplier_framework_agreement.pdf) | Project document staged in Lab 2 Task 11 |
-| [Austin receiving inspection report](documents_austin_receiving_inspection_report.pdf) | Project document staged in Lab 2 Task 11 |
-| [Austin structural specification](documents_austin_structural_engineering_specification.pdf) | Project document staged in Lab 2 Task 11 |
+| [Supplier framework agreement](documents_atlas_supplier_framework_agreement.pdf) | Optional project document; not used by the current notebooks |
+| [Austin receiving inspection report](documents_austin_receiving_inspection_report.pdf) | Optional project document; not used by the current notebooks |
+| [Austin structural specification](documents_austin_structural_engineering_specification.pdf) | Optional project document; not used by the current notebooks |
 
 The CSVs contain 23 data rows in total; the three PDFs contain five pages in total.
 
 ### Required workspace files
 
-Only six files are needed in the AIDP workspace: the four notebooks and these two support files:
+Only five files are required in the AIDP workspace: the four notebooks and [config/workshop.json](aidp-livelabs/config/workshop.json), read by every notebook.
 
-- [config/workshop.json](aidp-livelabs/config/workshop.json): configuration read by every notebook.
-- [reference/pdf-manifest.json](aidp-livelabs/reference/pdf-manifest.json): PDF names and hashes read only by Lab 2 Task 11.
+The existing [PDF manifest](aidp-livelabs/reference/pdf-manifest.json) and sample PDFs remain in the repository, but are optional assets: the current notebooks no longer read or stage PDFs.
 
-The CSV/PDF inputs belong in a **volume**, not in the notebook folder. The optional [workflow template](aidp-livelabs/workflows/seer-labs.template.json) is not a notebook runtime dependency.
+The CSV inputs belong in a **volume**, not in the notebook folder. The optional [workflow template](aidp-livelabs/workflows/seer-labs.template.json) is not a notebook runtime dependency.
 
 ## Prepare your AIDP environment
 
@@ -83,9 +84,9 @@ Use the following example names or update them consistently in the notebook setu
 | Spark cluster | `seer_livelabs_spark` |
 | Schemas | `seer_bronze`, `seer_silver`, `seer_gold` |
 | Source volume | `seer_livelabs_20260922.seer_bronze.source_files` |
-| Output volume | `seer_livelabs_20260922.seer_gold.workshop_outputs` |
+| Optional document volume | `seer_livelabs_20260922.seer_gold.workshop_outputs` |
 
-In **Master catalog**, create the dedicated catalog and the Bronze/Gold schemas needed for the volumes. Create managed volumes named **source_files** under Bronze and **workshop_outputs** under Gold. Each Lab 1 notebook also runs `CREATE SCHEMA IF NOT EXISTS` for its target schema.
+In **Master catalog**, create the dedicated catalog and Bronze schema, then create a managed volume named **source_files** under Bronze. The Gold `workshop_outputs` volume is only needed if you separately use the optional document assets. Each Lab 1 notebook runs `CREATE SCHEMA IF NOT EXISTS` for its target schema.
 
 All layers remain in this standard catalog. No external database or vector catalog is required. This repository supplies no live workbench OCID, credentials, cluster key or other connection details.
 
@@ -94,8 +95,8 @@ Create the workspace and Spark cluster. The prepared workshop used Spark 3.5.0 o
 ### 2. Upload the source data
 
 1. Open **Master catalog → your catalog → seer_bronze → Volumes → source_files**.
-2. Use the volume's upload action to upload all five CSVs and three PDFs at the volume root. Do not rename them or add a second nesting folder.
-3. Confirm there are eight files.
+2. Upload the five CSVs at the volume root. Do not rename them or add a second nesting folder. The three PDFs are optional.
+3. Confirm all five CSV filenames match the repository.
 4. In `config/workshop.json`, confirm `source_layout` is `flat` and the paths match your volumes:
    - `source_root`: `/Volumes/seer_livelabs_20260922/seer_bronze/source_files`
    - `output_root`: `/Volumes/seer_livelabs_20260922/seer_gold/workshop_outputs`
@@ -110,8 +111,6 @@ In your workspace, create this folder structure:
 /Workspace/Shared/seer-aidp-livelabs/
   config/
     workshop.json
-  reference/
-    pdf-manifest.json
   notebooks/
     Lab1A_Bronze_Ingestion.ipynb
     Lab1B_Silver_Transformations.ipynb
@@ -119,7 +118,7 @@ In your workspace, create this folder structure:
     Lab2_Predict_Investigate_and_Operationalize.ipynb
 ```
 
-Upload the two JSON files as ordinary workspace files. Import the four IPYNB files as **notebooks**, not text files. Each must open with separate Markdown and Python cells.
+Upload `config/workshop.json` as an ordinary workspace file. Import the four IPYNB files as **notebooks**, not text files. Each must open with separate Markdown and Python cells.
 
 Keep the default workspace path unless you also change every affected notebook setup path and workflow parameter. The native workspace metadata may omit the leading slash; Python filesystem reads use `/Workspace/...`.
 
@@ -162,73 +161,74 @@ Run setup and the five commented transformation tasks, followed by the table-cou
 | Assets | `assets` | Apply the fixture's one-asset-per-project mapping and join project names |
 | Purchase orders | `purchase_orders` | Resolve asset/supplier references, retain unmatched suppliers, normalize status and convert currency to integer USD cents |
 | Inspections | `inspections` | Join project/asset identifiers and normalize inspection status |
-| Milestones | `milestones` | Join project/asset identifiers and normalize status while retaining source dates |
+| Milestones | `milestones` | Join identifiers, normalize status, cast planned/actual dates and derive `late_flag` only for completed work |
 
-Expected counts are six suppliers, three assets, four purchase orders, four inspections and four milestones. Inspections and milestones also display their first five rows. The final cell lists every Silver table and its count.
+Expected counts are six suppliers, three assets, four purchase orders, four inspections and four milestones. Inspections display sample rows; milestones display activity IDs, planned/actual dates, status and `late_flag`. The final cell lists every Silver table and its count.
 
 Each transformation writes one table in one step. There is no separate Silver validation, quarantine, or summary-table task. Known source issues remain visible rather than being silently corrected.
 
 ### Lab 1C: Build Gold
 
-Run the three code cells:
+Run the five code cells in order:
 
 1. **Setup:** read configuration and create the Gold schema if absent.
-2. **Build project context:** use `spark.sql()` with CTEs to aggregate purchase orders, supplier status and inspections before joining to assets and milestones. Preaggregation avoids multiplying costs.
-3. **Build milestone features:** use PySpark DataFrame functions to select unfinished milestones due 1–30 days after the fixture date and compute nine numeric model inputs.
+2. **Task 1 — Build project context:** use Spark SQL CTEs to aggregate purchase orders, supplier status and inspections before joining. Preaggregation avoids multiplying costs.
+3. **Task 2 — Build milestone features:** select unfinished milestones due 1–30 days after the fixture date and compute nine numeric inputs.
+4. **Task 3 — Publish known milestone outcomes:** save completed milestones with known `late_flag` values in `milestone_outcomes`. Unknown outcomes are excluded.
+5. **Task 4 — Build milestone training data:** create `milestone_training` from feature rows, status-derived proxy labels, and completion-outcome rows joined by project and asset.
 
-Browse `seer_gold.project_context` and `seer_gold.milestone_features`; each should contain three rows. The supplied fixture has Austin committed cost of 167,390,000 cents and total committed cost of 473,090,000 cents.
+Each write drops and recreates its target: `project_context`, `milestone_features`, `milestone_outcomes` or `milestone_training`.
 
-Gold remains in the same catalog. Source extraction dates and notebook refresh timestamps represent different things.
+The supplied fixture has three current feature milestones and one known completed milestone. The context has Austin committed cost of 167,390,000 cents and total cost of 473,090,000 cents. Verify actual outputs in your environment; this synchronization did not execute Spark.
+
+**Training-data limitation:** the proxy target is copied from `milestone_at_risk_flag`, which is also an input feature. Completion outcomes are joined by project/asset rather than by an identical historical milestone snapshot. This is a small lifecycle demonstration with target leakage and temporal-alignment limitations, not a valid predictive evaluation.
+
+Some workbench Markdown still describes the earlier two-table Gold version; the current code writes four Gold tables. Exported code is preserved as authored.
 
 ### Inspect lineage
 
 Refresh the catalog, open `milestone_features`, and choose **Actions → Lineage (Preview)**. Trace Gold inputs through Silver to Bronze. Task/process nodes between tables are expected. Inspect the actual graph after execution; successful table writes alone do not prove lineage capture.
 
-At the end of Lab 1, there are five Bronze, five Silver and two Gold tables.
+At the end of Lab 1, the current code creates five Bronze, five Silver and four Gold tables.
 
 ## Lab 2: MLflow model lifecycle
 
-Complete Lab 1 first. Open the Lab 2 notebook, attach the same cluster, and run its 11 tasks in order. For your first walkthrough, **run one cell at a time** and pause after Task 6; **Run all** does not pause for the first-round comparison.
+Complete Lab 1, including its Gold training-table task. Open Lab 2, attach the cluster and run its **10 Python tasks** in order. Run one cell at a time and pause after Task 6 to compare the first model family.
 
 | Task | Action | What to inspect |
 | --- | --- | --- |
-| 1 | Create or reuse `seer_milestone_delay` | Experiment ID, new comparison `SESSION_ID`, library versions |
-| 2 | Generate 1,800 labeled synthetic examples | Sample milestone IDs, dates and `late_flag`; no PDFs are used for training |
-| 3 | Make chronological train/validation/test splits | 1,140 training, 391 validation, 183 test and 86 excluded rows |
-| 4 | Define explicit MLflow run logging | Parameters, metrics, model signature and probability-prediction interface |
-| 5 | Train three Gradient Boosting candidates | Three distinct run IDs and validation metrics |
-| 6 | Compare round one | Exactly three rows in the notebook's session-filtered comparison |
-| 7 | Train three Decision Tree candidates | Three more runs in the same experiment and session |
-| 8 | Compare all six and select the winner | Rank by validation average precision, then Brier score and run ID; evaluate only the winner on the held-out test set |
-| 9 | Register the selected artifact | Fully qualified catalog model name, returned version and originating run |
-| 10 | Reload that registered version and score Gold | Three persisted predictions and their model/run identifiers |
-| 11 | Stage the three project PDFs | Verified files under the output volume's `austin-project` folder |
+| 1 | Create or reuse `seer_milestone_delay` | Experiment and new comparison `SESSION_ID` |
+| 2 | Load Gold training data | Read `milestone_training` into pandas; inspect row/class counts |
+| 3 | Split training and validation | 50/50 stratified split with `random_state=42`; every candidate uses the same split |
+| 4 | Define MLflow helpers | Run tags, parameters, validation metrics and artifacts |
+| 5 | Train three Decision Trees | Runs `dt_r1_1` to `dt_r1_3` |
+| 6 | Compare round one | Inspect three finished runs in the notebook and Experiments UI |
+| 7 | Train three Gradient Boosting models | Runs `gb_r2_1` to `gb_r2_3` in the same experiment/session |
+| 8 | Compare and select | Highest validation F1, then lowest Brier score, then run name |
+| 9 | Register the selected model | Catalog model `<catalog>.seer_gold.milestone_delay_classifier` and explicit version |
+| 10 | Reload and score | Load that version, score `milestone_features` and display predictions |
 
-### Inspect experiments and models
+There is no synthetic-data generator, held-out test partition, PDF-staging task or persisted prediction-table write in this version.
 
-- Open **Experiments → seer_milestone_delay**. Inspect run parameters, metrics and artifacts; use **Compare** for charts.
-- On repeat exercises, the UI can show old runs with the same names. Use run IDs and the notebook's session-filtered comparison to identify this walkthrough.
-- Register once in Task 9. Do not also register through the UI unless you intentionally want another model version.
-- Open **Master catalog → your catalog → seer_gold → Models → milestone_delay_classifier**. Inspect **Versions** and follow the source-run link.
-- Task 10 reloads `models:/<catalog>.seer_gold.milestone_delay_classifier/<version>`, not an unversioned “latest” model. An MLflow Spark UDF scores the saved Gold features.
-- Inspect `seer_gold.milestone_delay_predictions`: three rows with `delay_probability`, `predicted_late`, `risk_band`, `model_name`, `model_version`, `model_run_id`, source `run_id` and `scoring_run_id`.
-- Task 10 compares persisted probabilities with predictions from the loaded model. A successful comparison verifies that read-back check, not production accuracy.
+### Compare, register and score
 
-The probability threshold is 0.5. Risk bands are workshop conventions: LOW below 0.4, MEDIUM from 0.4 to below 0.7, and HIGH at or above 0.7. Model artifacts belong to MLflow/catalog storage, not extra Gold Delta tables.
+1. Open **Experiments → seer_milestone_delay**. Inspect run parameters, metrics and artifacts. Use **Compare** to view F1 and Brier score.
+2. Identify this walkthrough by its session tag/run IDs. Historical runs remain visible.
+3. Use Task 8's ranking to select the winner. The helper includes finished runs for the current session; the former exact-six-run guard is absent, so run both rounds once and verify the intended six candidates yourself.
+4. For an uninterrupted notebook walkthrough, run Task 9's registration cell once. It defines `MODEL_VERSION` and `REGISTERED_URI` for Task 10.
+5. The workbench instructions also allow **Experiments → selected run → Register**. If choosing this UI-only route, Task 10 still needs those variables set to the actual registered version. The current notebook does not resolve UI registration automatically. Do not use both routes unless you intend another version.
+6. Browse **Master catalog → your catalog → seer_gold → Models → milestone_delay_classifier → Versions** and follow the source-run link.
+7. Task 10 loads `models:/<catalog>.seer_gold.milestone_delay_classifier/<version>` and uses an MLflow Spark UDF to display milestone ID, project/milestone names, planned date, delay probability, predicted class and model version.
 
-### PDF staging and completion
+The threshold is 0.5. Task 10 displays scores only: it does not save a Delta predictions table, create risk bands or perform the old persisted-score read-back check. A `milestone_delay_predictions` table left from an earlier version is not refreshed by this code.
 
-Task 11 reads `reference/pdf-manifest.json`, verifies the source PDF hashes and copies missing files to:
+### Data prerequisites and limitations
 
-```text
-/Volumes/seer_livelabs_20260922/seer_gold/workshop_outputs/austin-project
-```
+The stratified split needs enough examples of each class in both partitions; ROC AUC needs both classes in validation. The entire Gold training table is collected to pandas on the driver, so use a bounded teaching dataset.
 
-Identical existing PDFs are reused. Differing bytes or unexpected destination files stop the cell for review.
+The tiny fixture, status-derived labels and absence of an independent test set cannot support meaningful real-world accuracy claims. Use sufficient independent historical snapshots with trustworthy outcomes for real predictive modeling.
 
-**Lab 2 ends at Task 11.** Staging PDFs does not create a knowledge base or train the classifier on documents. Knowledge-base ingestion, agent testing, quality/freshness review and readiness assessment are not required lab tasks.
-
-Completion means six candidate runs in one experiment, a registered winner, three predictions scored using its explicit registered version, and three staged PDFs. The Gold schema now has three tables: `project_context`, `milestone_features` and `milestone_delay_predictions`.
+**Lab 2 ends at Task 10.** PDFs, their manifest, a document output volume, knowledge-base ingestion and agent testing are not required by the current Lab 2.
 
 ## Reruns and recovery
 
@@ -238,10 +238,9 @@ Completion means six candidate runs in one experiment, a registered winner, thre
 | --- | --- |
 | Lab 1A | Recreates its five named Bronze tables without backups |
 | Lab 1B | Recreates its five named Silver tables without backups |
-| Lab 1C | Recreates `project_context` and `milestone_features` without backups |
-| Full Lab 2, beginning at Task 1 | Starts a new comparison session, retains history, adds six runs and a model version, overwrites predictions, and stages PDFs |
-| Lab 2 Task 10 only | Reloads the selected registered version and overwrites predictions, without training or registration |
-| Lab 2 Task 11 only | Reuses identical PDFs and copies missing files |
+| Lab 1C | Recreates context, features, outcomes and training tables without backups |
+| Full Lab 2, beginning at Task 1 | Starts a new session, retains history, adds six runs and a model version, and displays scores |
+| Lab 2 Task 10 only | Reloads the selected version and displays scores without training, registration or table writes |
 | Full workflow | Repeats all three Lab 1 notebooks, then Lab 2 |
 
 Lab 1's drops discard target-table history and table-specific metadata. A failure between drop and write can leave a table absent; the multi-table rebuild is not atomic. Source files, volumes, models and unrelated tables are not reset.
@@ -253,15 +252,15 @@ Lab 1's drops discard target-table history and table-specific metadata. A failur
 - Gold transformation changed and Silver is current: **Lab 1C → Lab 2**.
 - Lab 2 only: run from Task 1; Lab 1 tables are read, not reset.
 
-Always start the chosen notebook with its setup and run subsequent cells in order. Upstream changes do not automatically refresh downstream data or predictions.
+Always start the chosen notebook with its setup and run subsequent cells in order. Upstream changes do not automatically refresh downstream tables. Rerun scoring to display updated scores; legacy prediction tables are not updated by current Lab 2.
 
 ### Training or registration fails
 
-Run Task 1 once per walkthrough and each training round once. Do not rerun Task 1 between rounds. Repeating a partially successful Task 5 or 7 in the same session can add extra candidates and fail the six-run check. Fix the cause and restart a complete walkthrough at Task 1; retain previous runs for troubleshooting.
+Run Task 1 once per walkthrough and each training round once. Do not rerun Task 1 between rounds. Repeating a partially successful Task 5 or 7 can add extra candidates to the comparison; there is no exact-six-run guard in this version. Fix the cause and restart a complete walkthrough at Task 1; retain previous runs for troubleshooting.
 
 Before retrying Task 9, inspect the model's **Versions** list: registration may already have succeeded. Every additional registration creates another version.
 
-Task 10 alone works only in the **same active notebook session** with variables such as `REGISTERED_URI`, `MODEL_NAME`, `MODEL_VERSION` and `best_run_id` available. It is not a standalone fresh-session inference script. If the session is lost, follow a full walkthrough or obtain a separate inference setup with an explicit model version and source run; do not guess them.
+Task 10 alone works only in the **same active notebook session** with variables such as `REGISTERED_URI`, `MODEL_VERSION`, `SCORING_TABLE`, `FEATURES` and `threshold` available. It is not a standalone fresh-session inference script. If the session is lost, follow a full walkthrough or obtain a separate inference setup with an explicit model version and source run; do not guess them.
 
 Run only one notebook/workflow writer at a time. Retained artifacts consume storage; cleanup is optional housekeeping, not a prerequisite. Keep model versions and source runs needed for traceability.
 
@@ -296,11 +295,13 @@ For API-based job creation, the optional [workflow template](aidp-livelabs/workf
 | --- | --- |
 | Notebook opens as raw JSON or one text cell | Import the IPYNB as a notebook, not a plain file |
 | Missing `spark` or no attached cluster | Select the correct workspace, attach the cluster and wait for readiness |
-| Missing configuration or PDF manifest | Verify the six required workspace files and exact folder paths |
-| Source file not found | Verify volume permissions, the eight filenames and `source_layout = flat` |
-| Gold tables missing | Finish Lab 1A, 1B and 1C in order in the same catalog |
+| Missing configuration | Verify the five required workspace files and exact paths |
+| Source file not found | Verify volume permissions, the five CSV filenames and `source_layout = flat` |
+| Gold training table missing | Complete Lab 1C through Task 4 in the same catalog |
 | Missing MLflow/scikit-learn | Use the approved runtime; do not replace AIDP's integrated MLflow |
-| Comparison empty or not exactly six candidates | Check run status and session ID; restart a full walkthrough after a partial/repeated training round |
+| Comparison empty or has extra candidates | Check run status and session ID; restart after a partial/repeated round |
+| Stratified split or ROC AUC fails | Inspect class counts and ensure both partitions have both classes |
+| `REGISTERED_URI` missing after UI registration | Define the exact registered URI/version for Task 10; do not register twice |
 | More runs visible in the UI | Historical runs are retained; compare current run IDs/session tags |
 | Model version is not 1 | Expected on a rerun; use the actual version returned by Task 9 |
 | Permission denied | Request the specific missing permission; do not switch catalogs to bypass controls |
