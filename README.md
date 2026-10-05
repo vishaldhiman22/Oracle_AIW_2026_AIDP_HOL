@@ -37,16 +37,13 @@ The source files are teaching fixtures. Lab 2 now trains from `seer_gold.milesto
 
 ## Get the files
 
-```bash
-git clone https://github.com/vishaldhiman22/Oracle_AIW_2026_AIDP_HOL.git
-cd Oracle_AIW_2026_AIDP_HOL
-```
+In AIDP workspace **HOL_Workspace**, use a Git folder to check out [this repository](https://github.com/vishaldhiman22/Oracle_AIW_2026_AIDP_HOL) on branch `main`. If you have already checked it out, pull the latest changes before starting. The labs read the notebooks, configuration and CSVs directly from this workspace checkout; a local laptop clone alone is not sufficient.
 
-Alternatively, use GitHub's **Code → Download ZIP** and extract it.
+The default checkout location used below is `/Workspace/Shared/Oracle_AIW_2026_AIDP_HOL`. If you selected a different Git folder, use its actual workspace path in the configuration and notebook setup cells.
 
 ### Included source inputs
 
-All five CSV inputs are in the [`data/`](data/) folder. No separate bucket download is required. Keep their filenames unchanged when uploading.
+All five CSV inputs are in the checkout's [`data/`](data/) folder. No separate bucket download or volume upload is required. Keep their filenames unchanged.
 
 | Input | Purpose |
 | --- | --- |
@@ -60,62 +57,67 @@ The CSVs contain 23 data rows in total.
 
 ### Required workspace files
 
-Only five files are required in the AIDP workspace: the four notebooks and [config/workshop.json](aidp-livelabs/config/workshop.json), read by every notebook.
+The checkout supplies the four notebooks, [config/workshop.json](aidp-livelabs/config/workshop.json), and the five CSV inputs. Every notebook reads the same configuration file.
 
-The CSV inputs belong in a **volume**, not in the notebook folder. The notebooks do not require PDFs, a reference folder or a workflow template.
+Lab 1A reads CSVs directly from the workspace Git folder. The notebooks do not require source volumes, PDFs, a reference folder or a workflow template.
 
 ## Prepare your AIDP environment
 
 ### 1. Confirm access and create dedicated resources
 
-Sign in to your authorized AIDP workbench. You need permission to use a workspace and Spark cluster, create/read/write the lab schemas and volumes, use experiments, and register model versions.
+Sign in to your authorized AIDP workbench. You need permission to use a workspace and Spark cluster, read the Git checkout, create/read/write the lab schemas and tables, use experiments, and register model versions.
 
 Use the following example names or update them consistently in the notebook setup cells and `config/workshop.json`:
 
 | Resource | Example name |
 | --- | --- |
 | Catalog | `seer_livelabs` |
-| Workspace | `seer_livelabs` |
+| Workspace | `HOL_Workspace` |
 | Spark cluster | `seer_livelabs_spark` |
 | Schemas | `seer_bronze`, `seer_silver`, `seer_gold` |
-| Source volume | `seer_livelabs.seer_bronze.source_files` |
-| Optional document volume | `seer_livelabs.seer_gold.workshop_outputs` |
+| Git checkout | `/Workspace/Shared/Oracle_AIW_2026_AIDP_HOL` |
+| CSV source folder | `/Workspace/Shared/Oracle_AIW_2026_AIDP_HOL/data` |
 
-In **Master catalog**, create the dedicated catalog and Bronze schema, then create a managed volume named **source_files** under Bronze. The Gold `workshop_outputs` volume is only needed if you separately use the optional document assets. Each Lab 1 notebook runs `CREATE SCHEMA IF NOT EXISTS` for its target schema.
+In **Master catalog**, create the dedicated catalog. No source or output volume is required. Each Lab 1 notebook runs `CREATE SCHEMA IF NOT EXISTS` for its target schema.
+
+The `workspace_name` setting documents which workspace to open; it does not create or rename a workspace. Workspace names are separate from catalog names, and `HOL_Workspace` is not a directory to insert into `/Workspace/...` paths. Keep `catalog` set to `seer_livelabs` unless you intentionally choose another catalog.
 
 All layers remain in this standard catalog. No external database or vector catalog is required. This repository supplies no live workbench OCID, credentials, cluster key or other connection details.
 
 Create the workspace and Spark cluster. The prepared workshop used Spark 3.5.0 on AMD compute, with a 2-OCPU/16-GB driver, one 2-OCPU/16-GB worker, and a 30-minute idle timeout. Use a compatible administrator-approved runtime; compute incurs charges.
 
-### 2. Upload the source data
+### 2. Confirm the Git checkout and configuration
 
-1. Open **Master catalog → your catalog → seer_bronze → Volumes → source_files**.
-2. Upload the five CSV files from the repository's `data/` folder directly to the volume root. Do not upload the `data` folder itself, rename files, or add a second nesting folder.
-3. Confirm all five CSV filenames match the repository.
-4. In `config/workshop.json`, confirm `source_layout` is `flat` and the paths match your volumes:
-   - `source_root`: `/Volumes/seer_livelabs/seer_bronze/source_files`
-   - `output_root`: `/Volumes/seer_livelabs/seer_gold/workshop_outputs`
+1. Open **HOL_Workspace** and locate the repository's Git folder.
+2. Confirm that its `data/` folder contains all five CSV files listed above. Do not upload them to a volume or copy them elsewhere.
+3. Open `aidp-livelabs/config/workshop.json` in the checkout. Confirm:
+   - `workspace_name`: `HOL_Workspace`
+   - `catalog`: `seer_livelabs`
+   - `source_root`: `/Workspace/Shared/Oracle_AIW_2026_AIDP_HOL/data` (or your actual checkout's `data/` path)
 
 Keep the supplied historical `fixture_as_of` date for reproducible results. Do not substitute today's date merely to make source data look fresh.
 
-### 3. Import the notebooks and support files
+### 3. Open the checked-out notebooks
 
-In your workspace, create this folder structure:
+The Git checkout already provides this structure; do not create a second copy:
 
 ```text
-/Workspace/Shared/seer-aidp-livelabs/
-  config/
-    workshop.json
-  notebooks/
-    Lab1A_Bronze_Ingestion.ipynb
-    Lab1B_Silver_Transformations.ipynb
-    Lab1C_Gold_Project_Data.ipynb
-    Lab2_Predict_Investigate_and_Operationalize.ipynb
+/Workspace/Shared/Oracle_AIW_2026_AIDP_HOL/
+  data/
+    (five CSV files)
+  aidp-livelabs/
+    config/
+      workshop.json
+    notebooks/
+      Lab1A_Bronze_Ingestion.ipynb
+      Lab1B_Silver_Transformations.ipynb
+      Lab1C_Gold_Project_Data.ipynb
+      Lab2_Predict_Investigate_and_Operationalize.ipynb
 ```
 
-Upload `config/workshop.json` as an ordinary workspace file. Import the four IPYNB files as **notebooks**, not text files. Each must open with separate Markdown and Python cells.
+Open the four IPYNB files from the checkout's `aidp-livelabs/notebooks/` folder. Each should open with separate Markdown and Python cells. Their setup cells read `/Workspace/Shared/Oracle_AIW_2026_AIDP_HOL/aidp-livelabs/config/workshop.json` by default.
 
-Keep the default workspace path unless you also change every affected notebook setup path and workflow parameter. The native workspace metadata may omit the leading slash; Python filesystem reads use `/Workspace/...`.
+If your Git folder is elsewhere, change `config_path` in all four notebook setup cells and `source_root` in the configuration to match. The native workspace metadata may omit the leading slash; Python filesystem reads use `/Workspace/...`.
 
 All four notebooks accept an optional `config_path` workflow parameter. Use it to test a separate configuration without overwriting the shared `config/workshop.json`. Interactive runs use the default workspace path above.
 
@@ -136,7 +138,7 @@ Run each notebook's setup first, then its remaining cells in order. Task numbers
 
 Open the Bronze notebook and run its seven code cells: setup, five imports, and a final table-count display.
 
-Each import reads one CSV with headers, keeps source fields as strings, recreates its named Delta table, and displays the first five rows. The source file is unchanged.
+Each import reads one CSV directly from the workspace checkout's `data/` folder with headers, keeps source fields as strings, recreates its named Delta table, and displays the first five rows. The source file is unchanged.
 
 | Feed | Bronze table | Expected rows |
 | --- | --- | --- |
@@ -277,7 +279,7 @@ After completing the interactive labs, optionally automate the four notebooks in
 
 3. Use **All success** dependency conditions, **Max concurrent runs = 1**, no schedule, and a 90-minute job timeout.
 4. Set each Lab 1 task timeout to 30 minutes and Lab 2 to 60 minutes. Keep Lab 2 automatic retries disabled.
-5. Pass `run_id = {{job.run_id}}` to all tasks. Set job parameter `config_path` to `/Workspace/Shared/seer-aidp-livelabs/config/workshop.json`.
+5. Pass `run_id = {{job.run_id}}` to all tasks. Set job parameter `config_path` to `/Workspace/Shared/Oracle_AIW_2026_AIDP_HOL/aidp-livelabs/config/workshop.json` (or the equivalent path in your Git checkout).
 6. Save, reopen and verify every notebook path, parameter and dependency.
 7. Stop interactive writers, choose **Run now** once, and inspect each task's output. All four tasks must reach **Success**.
 8. Verify table counts, model registration, predictions and actual lineage in your environment.
@@ -291,7 +293,7 @@ Workflow concurrency does not block simultaneous interactive notebook writes. A 
 | Notebook opens as raw JSON or one text cell | Import the IPYNB as a notebook, not a plain file |
 | Missing `spark` or no attached cluster | Select the correct workspace, attach the cluster and wait for readiness |
 | Missing configuration | Verify the five required workspace files and exact paths |
-| Source file not found | Verify volume permissions, the five CSV filenames and `source_layout = flat` |
+| Source file not found | Confirm the Git checkout exists in HOL_Workspace, `source_root` points to its `data/` folder, workspace file access is allowed, and the five CSV filenames are unchanged |
 | Gold training table missing | Complete Lab 1C through Task 4 in the same catalog |
 | Missing MLflow/scikit-learn | Use the approved runtime; do not replace AIDP's integrated MLflow |
 | Comparison empty or has extra candidates | Check run status and session ID; restart after a partial/repeated round |
