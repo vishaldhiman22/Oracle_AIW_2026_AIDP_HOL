@@ -1,12 +1,12 @@
 {
-  "catalog": "seer_livelabs_20260922",
+  "catalog": "seer_livelabs",
   "schemas": {
     "bronze": "seer_bronze",
     "silver": "seer_silver",
     "gold": "seer_gold"
   },
-  "source_root": "/Volumes/seer_livelabs_20260922/seer_bronze/source_files",
-  "output_root": "/Volumes/seer_livelabs_20260922/seer_gold/workshop_outputs",
+  "source_root": "/Volumes/seer_livelabs/seer_bronze/source_files",
+  "output_root": "/Volumes/seer_livelabs/seer_gold/workshop_outputs",
   "source_layout": "flat",
   "fixture_as_of": "2026-07-14T01:00:00+00:00",
   "freshness_sla_minutes": 1440,

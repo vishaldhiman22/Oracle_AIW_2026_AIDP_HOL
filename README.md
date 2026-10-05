@@ -74,12 +74,12 @@ Use the following example names or update them consistently in the notebook setu
 
 | Resource | Example name |
 | --- | --- |
-| Catalog | `seer_livelabs_20260922` |
-| Workspace | `seer_livelabs_20260922` |
+| Catalog | `seer_livelabs` |
+| Workspace | `seer_livelabs` |
 | Spark cluster | `seer_livelabs_spark` |
 | Schemas | `seer_bronze`, `seer_silver`, `seer_gold` |
-| Source volume | `seer_livelabs_20260922.seer_bronze.source_files` |
-| Optional document volume | `seer_livelabs_20260922.seer_gold.workshop_outputs` |
+| Source volume | `seer_livelabs.seer_bronze.source_files` |
+| Optional document volume | `seer_livelabs.seer_gold.workshop_outputs` |
 
 In **Master catalog**, create the dedicated catalog and Bronze schema, then create a managed volume named **source_files** under Bronze. The Gold `workshop_outputs` volume is only needed if you separately use the optional document assets. Each Lab 1 notebook runs `CREATE SCHEMA IF NOT EXISTS` for its target schema.
 
@@ -93,8 +93,8 @@ Create the workspace and Spark cluster. The prepared workshop used Spark 3.5.0 o
 2. Upload the five CSV files from the repository's `data/` folder directly to the volume root. Do not upload the `data` folder itself, rename files, or add a second nesting folder.
 3. Confirm all five CSV filenames match the repository.
 4. In `config/workshop.json`, confirm `source_layout` is `flat` and the paths match your volumes:
-   - `source_root`: `/Volumes/seer_livelabs_20260922/seer_bronze/source_files`
-   - `output_root`: `/Volumes/seer_livelabs_20260922/seer_gold/workshop_outputs`
+   - `source_root`: `/Volumes/seer_livelabs/seer_bronze/source_files`
+   - `output_root`: `/Volumes/seer_livelabs/seer_gold/workshop_outputs`
 
 Keep the supplied historical `fixture_as_of` date for reproducible results. Do not substitute today's date merely to make source data look fresh.
 
@@ -116,6 +116,8 @@ In your workspace, create this folder structure:
 Upload `config/workshop.json` as an ordinary workspace file. Import the four IPYNB files as **notebooks**, not text files. Each must open with separate Markdown and Python cells.
 
 Keep the default workspace path unless you also change every affected notebook setup path and workflow parameter. The native workspace metadata may omit the leading slash; Python filesystem reads use `/Workspace/...`.
+
+All four notebooks accept an optional `config_path` workflow parameter. Use it to test a separate configuration without overwriting the shared `config/workshop.json`. Interactive runs use the default workspace path above.
 
 ### 4. Attach compute
 
