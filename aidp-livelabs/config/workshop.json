@@ -1,6 +1,6 @@
 {
   "workspace_name": "HOL_Workspace",
-  "catalog": "seer_livelabs",
+  "catalog": "default",
   "schemas": {
     "bronze": "seer_bronze",
     "silver": "seer_silver",

@@ -2,7 +2,7 @@
 
 Build a construction-project lakehouse, then train and use a milestone-delay classifier with Oracle AI Data Platform (AIDP) and MLflow.
 
-Notebook source was synchronized from the workbench on **September 30, 2026**. This is a source export, not a new successful execution claim.
+Lab 1A's seven code cells were verified on AIDP on **October 5, 2026**, including relative configuration loading and workspace CSV ingestion (23 rows across five Bronze tables). This repository includes that tested code. The run used the existing workshop catalog; the new `default` catalog setting and other notebooks were not re-executed as part of this update.
 
 This README is the single learner guide. Detailed explanations and task instructions are also embedded in the four notebooks. No separate `docs/`, `tools/`, or support Python library is required.
 
@@ -71,16 +71,16 @@ Use the following example names or update them consistently in the notebook setu
 
 | Resource | Example name |
 | --- | --- |
-| Catalog | `seer_livelabs` |
+| Catalog | `default` |
 | Workspace | `HOL_Workspace` |
 | Spark cluster | `seer_livelabs_spark` |
 | Schemas | `seer_bronze`, `seer_silver`, `seer_gold` |
 | Git checkout | `/Workspace/Shared/Oracle_AIW_2026_AIDP_HOL` |
 | CSV source folder | `/Workspace/Shared/Oracle_AIW_2026_AIDP_HOL/data` |
 
-In **Master catalog**, create the dedicated catalog. No source or output volume is required. Each Lab 1 notebook runs `CREATE SCHEMA IF NOT EXISTS` for its target schema.
+In **Master catalog**, confirm access to the existing `default` catalog and permission to create schemas and tables. No source or output volume is required. Each Lab 1 notebook runs `CREATE SCHEMA IF NOT EXISTS` for its target schema. Use these lab schemas only for workshop data: reruns drop and recreate the named tables.
 
-The `workspace_name` setting documents which workspace to open; it does not create or rename a workspace. Workspace names are separate from catalog names, and `HOL_Workspace` is not a directory to insert into `/Workspace/...` paths. Keep `catalog` set to `seer_livelabs` unless you intentionally choose another catalog.
+The `workspace_name` setting documents which workspace to open; it does not create or rename a workspace. Workspace names are separate from catalog names, and `HOL_Workspace` is not a directory to insert into `/Workspace/...` paths. Keep `catalog` set to `default` unless you intentionally choose another authorized catalog. All four notebooks derive their table and model destinations from this setting.
 
 All layers remain in this standard catalog. No external database or vector catalog is required. This repository supplies no live workbench OCID, credentials, cluster key or other connection details.
 
@@ -92,7 +92,7 @@ Create the workspace and Spark cluster. The prepared workshop used Spark 3.5.0 o
 2. Confirm that its `data/` folder contains all five CSV files listed above. Do not upload them to a volume or copy them elsewhere.
 3. Open `aidp-livelabs/config/workshop.json` in the checkout. Confirm:
    - `workspace_name`: `HOL_Workspace`
-   - `catalog`: `seer_livelabs`
+   - `catalog`: `default`
    - `source_root`: `/Workspace/Shared/Oracle_AIW_2026_AIDP_HOL/data` (or your actual checkout's `data/` path)
 
 Keep the supplied historical `fixture_as_of` date for reproducible results. Do not substitute today's date merely to make source data look fresh.
@@ -115,11 +115,11 @@ The Git checkout already provides this structure; do not create a second copy:
       Lab2_Predict_Investigate_and_Operationalize.ipynb
 ```
 
-Open the four IPYNB files from the checkout's `aidp-livelabs/notebooks/` folder. Each should open with separate Markdown and Python cells. Their setup cells read `/Workspace/Shared/Oracle_AIW_2026_AIDP_HOL/aidp-livelabs/config/workshop.json` by default.
+Open the four IPYNB files from the checkout's `aidp-livelabs/notebooks/` folder. Each should open with separate Markdown and Python cells. Lab 1A reads `../config/workshop.json` relative to its notebook folder. Keep `config/` and `notebooks/` together under `aidp-livelabs/`. The other three notebooks read `/Workspace/Shared/Oracle_AIW_2026_AIDP_HOL/aidp-livelabs/config/workshop.json` by default.
 
-If your Git folder is elsewhere, change `config_path` in all four notebook setup cells and `source_root` in the configuration to match. The native workspace metadata may omit the leading slash; Python filesystem reads use `/Workspace/...`.
+If your Git folder is elsewhere, update `source_root` in the configuration and `config_path` in Lab 1B, Lab 1C and Lab 2 to match. Lab 1A's relative config path stays unchanged when the folder structure is preserved. The native workspace metadata may omit the leading slash; absolute Python filesystem reads use `/Workspace/...`.
 
-All four notebooks accept an optional `config_path` workflow parameter. Use it to test a separate configuration without overwriting the shared `config/workshop.json`. Interactive runs use the default workspace path above.
+Lab 1B, Lab 1C and Lab 2 accept an optional `config_path` workflow parameter. Lab 1A intentionally uses the simple relative path directly and does not read that parameter. For an end-to-end run, ensure all four notebooks read the same configuration.
 
 ### 4. Attach compute
 
@@ -279,7 +279,7 @@ After completing the interactive labs, optionally automate the four notebooks in
 
 3. Use **All success** dependency conditions, **Max concurrent runs = 1**, no schedule, and a 90-minute job timeout.
 4. Set each Lab 1 task timeout to 30 minutes and Lab 2 to 60 minutes. Keep Lab 2 automatic retries disabled.
-5. Pass `run_id = {{job.run_id}}` to all tasks. Set job parameter `config_path` to `/Workspace/Shared/Oracle_AIW_2026_AIDP_HOL/aidp-livelabs/config/workshop.json` (or the equivalent path in your Git checkout).
+5. Pass `run_id = {{job.run_id}}` to tasks that use it. Lab 1A reads `../config/workshop.json` directly. For Lab 1B, Lab 1C and Lab 2, set `config_path` to the same file's absolute workspace path, such as `/Workspace/Shared/Oracle_AIW_2026_AIDP_HOL/aidp-livelabs/config/workshop.json`.
 6. Save, reopen and verify every notebook path, parameter and dependency.
 7. Stop interactive writers, choose **Run now** once, and inspect each task's output. All four tasks must reach **Success**.
 8. Verify table counts, model registration, predictions and actual lineage in your environment.
