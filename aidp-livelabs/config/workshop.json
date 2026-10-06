@@ -6,7 +6,7 @@
     "silver": "seer_silver",
     "gold": "seer_gold"
   },
-  "source_root": "/Workspace/Shared/Oracle_AIW_2026_AIDP_HOL/data",
+  "source_root": "/Workspace/aiw_hol/data",
   "fixture_as_of": "2026-07-14T01:00:00+00:00",
   "freshness_sla_minutes": 1440,
   "max_driver_rows": 10000,
