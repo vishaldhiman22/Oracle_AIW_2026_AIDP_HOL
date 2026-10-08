@@ -19,3 +19,6 @@ aidp-livelabs/validation/*
 aidp-livelabs/tools/
 aidp-livelabs/config/*.local.json
 aidp-livelabs/workflows/*.rendered.json
+
+# Screenshots are maintained with the local learner guide, not in Git.
+/assets/screenshots/

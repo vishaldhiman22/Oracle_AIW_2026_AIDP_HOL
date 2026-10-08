@@ -1,10 +1,8 @@
 # Oracle AI World 2026 AIDP Hands-on Lab
 
-Build a Bronze–Silver–Gold lakehouse, then train, compare, register and reload a milestone-delay model using AIDP and MLflow. Follow the numbered steps below; each has an annotated screenshot. Run Python cells individually, in notebook order.
+Build a Bronze–Silver–Gold lakehouse, then train, compare, register and reload a milestone-delay model using AIDP and MLflow. Follow the numbered steps below. Run Python cells individually, in notebook order.
 
 **Before you begin:** your instructor must provide access to an AIDP workbench, a workspace (example: `HOL_Workspace`), a compatible Spark cluster, and permission to create lab schemas/tables and register models in the `default` catalog. Do not use production tables. Different workspaces in the same instance can share catalog tables: use instructor-assigned schema names if multiple learners share the same catalog.
-
-**Screenshots:** genuine AIDP/GitHub UI captures with numbered annotations. Some captures show an older demonstration workspace/catalog or previously saved outputs. Follow the values printed in this guide and the annotations, not old dated names. The cluster-selection image is from an earlier UI capture. Screenshots are guidance, not proof of a new execution.
 
 **Credential safety:** this public repository never contains a personal access token (PAT). Obtain an authorized, short-lived credential privately from your instructor, or use your own account and token. Never paste tokens into notebooks, JSON, screenshots or Git commits. Revoke any token accidentally shared publicly.
 
@@ -21,17 +19,13 @@ Allow approximately 45–60 minutes for Lab 1 and 60–90 minutes for Lab 2, plu
 
 ## Step 1 Download everything from GitHub
 
-Open [the public workshop repository](https://github.com/vishaldhiman22/Oracle_AIW_2026_AIDP_HOL). Select branch **main**, click the green **Code** button, then **Download ZIP**. Extract the downloaded archive on your computer. It contains all four notebooks, the configuration, five CSVs, and this guide with its screenshots.
+Open [the public workshop repository](https://github.com/vishaldhiman22/Oracle_AIW_2026_AIDP_HOL). Select branch **main**, click the green **Code** button, then **Download ZIP**. Extract the downloaded archive on your computer. It contains all four notebooks, the configuration, five CSVs, and this guide.
 
 Keep the extracted files for reference. **Do not upload the ZIP to AIDP or run notebooks from your laptop.** In Steps 4–5, AIDP will fetch the same repository into a Git folder for execution. A ZIP download and an AIDP Git clone are separate copies.
-
-![Code menu with Download ZIP and HTTPS URL annotated](assets/screenshots/01-download.png)
 
 ## Step 2 Open Git credential settings
 
 Sign in to the workbench URL supplied by your instructor. In the left navigation, click **Settings**, then **Git linked accounts**, then **Add credential**. This is the Git-linked account setting, not the general **Credential store**.
-
-![Settings, Git linked accounts and Add credential annotated](assets/screenshots/03-settings.png)
 
 ## Step 3 Add the GitHub credential
 
@@ -46,19 +40,13 @@ Fill the dialog using the table below, then click **Add**. Confirm the credentia
 
 If using your own GitHub PAT, enter **your own GitHub email** instead. Do not combine your own PAT with the workshop account's email. Use only the repository-read access required by your approved workshop setup; pushing changes is not part of this lab.
 
-The screenshot deliberately leaves the token field empty. Keep the token hidden when entering it.
-
-![GitHub credential fields and Add button annotated; token field empty](assets/screenshots/02-credential.png)
+Keep the token hidden when entering it.
 
 ## Step 4 Open the workspace root
 
 Click **Workspaces**, open your assigned workspace (for example **HOL_Workspace**), and select the workspace's **top-level/root folder** in the tree. The breadcrumb should end at the workspace name.
 
 **Do not enter Shared or another child folder.** From the workspace root, click **Create → Git folder (Preview)**.
-
-The screenshot uses an existing demonstration workspace; select your own assigned workspace at the same level.
-
-![Workspace root, Create menu and Git folder option annotated](assets/screenshots/04-workspace-root.png)
 
 ## Step 5 Create the aiw_hol Git folder
 
@@ -72,8 +60,6 @@ Enter these values in **Create Git folder**, then click **Create**:
 | Branch name | `main` |
 
 Wait for cloning to finish. Open **aiw_hol → Content** and confirm that `data`, `aidp-livelabs` and `README.md` are present. Creating this Git folder downloads the files into AIDP; no manual CSV upload is required. If the clone fails, check the credential and repository URL with the instructor before retrying.
-
-![Git folder form with repository URL, aiw_hol and main annotated](assets/screenshots/05-git-folder.png)
 
 This is the [Oracle-documented Git folder workflow](https://docs.oracle.com/en/cloud/paas/ai-data-platform/aidug/git-integration.html). If `aiw_hol` already exists, inspect it rather than deleting it; obtain instructor guidance before replacing or pulling over local edits.
 
@@ -96,15 +82,12 @@ Click `workshop.json` to open its editor. Verify these settings; the committed f
 
 If you change anything, preserve valid JSON and choose **File → Save**. Verify the saved indicator before proceeding. Do not replace the whole configuration with just these fields; retain the other supplied settings and historical `fixture_as_of` date.
 
-![Config editor with catalog, source_root and File menu annotated](assets/screenshots/06-config.png)
-
 **Important path rules**
 
 - A Git folder at the workspace root named `aiw_hol` uses `/Workspace/aiw_hol`. Do not insert `HOL_Workspace` into that filesystem path.
 - `workspace_name` is descriptive; it does not create or rename a workspace and does not control file resolution.
 - If you intentionally used a different folder/location, change `source_root` to its actual `data` folder. Also change `config_path` in **Lab 1B, Lab 1C and Lab 2** to that checkout's `aidp-livelabs/config/workshop.json`.
 - **Lab 1A** uses `config_path = "../config/workshop.json"`. Keep its relative path and the supplied directory structure.
-- The screenshot shows an older configuration only to locate the editor fields. Do not copy its dated catalog, `Shared` path, or obsolete output-volume setting.
 
 Your workspace tree should be:
 
@@ -112,7 +95,6 @@ Your workspace tree should be:
 HOL_Workspace (workspace root)
 └── aiw_hol (Git folder, branch main)
     ├── README.md
-    ├── assets/screenshots/
     ├── data/
     │   ├── source-data_suppliers_supplier_extract.csv
     │   ├── source-data_assets_financial_assets.csv
@@ -134,15 +116,11 @@ Navigate to **aiw_hol → aidp-livelabs → notebooks**. Click **Lab1A_Bronze_In
 
 Use the four notebooks in the order shown below. Do not make another copy in `Shared`.
 
-![Four notebook filenames annotated in execution order](assets/screenshots/19-notebooks.png)
-
 ## Step 8 Attach a Spark cluster
 
 In the notebook's upper-right corner, click **Cluster → Attach existing cluster**, then select your instructor-assigned cluster, for example **seer_livelabs_spark**.
 
 Wait until the cluster is running/ready and the notebook shows the intended cluster. Repeat this attachment check when opening **each** of the other three notebooks. Attaching compute does not run the cells.
-
-![Cluster menu, Attach existing cluster and cluster selection annotated](assets/screenshots/07-attach.png)
 
 If the menu says **No clusters available**, or the badge says **Stopped**, ask the instructor to start/provision the assigned cluster through **Compute** and confirm your permissions. Do not run code while compute is unavailable. The prepared workshop used Spark 3.5.0 on AMD compute (2-OCPU/16-GB driver and worker); use the approved workshop runtime, including AIDP's MLflow integration. No GPU or XGBoost installation is needed.
 
@@ -151,8 +129,6 @@ If the menu says **No clusters available**, or the badge says **Stopped**, ask t
 Click inside the **first Python code cell** so only that cell is selected. Open the notebook menu **Run → Run selected cell(s)**. The menu also displays the platform-specific keyboard shortcut.
 
 Wait for completion before selecting the next Python cell. Inspect its output below the cell. A setup cell may return `DataFrame[]` or no output; that alone is not a failure. If a red traceback appears, stop and resolve it before continuing.
-
-![Selected Python code cell and Run selected cell(s) annotated](assets/screenshots/08-run-cell.png)
 
 **Do not click Run all** during the walkthrough. Do not choose **Run selected text**, and do not select multiple cells. Markdown cells explain the task; select the Python cell below the explanation. A bracketed number such as `[8]` is an execution counter, not the task number and not necessarily its first execution.
 
@@ -174,9 +150,7 @@ Run all seven code cells in this order using Step 9:
 
 Every load reads from `/Workspace/aiw_hol/data`, preserves fields as strings, replaces only its named Bronze table, and displays a sample. Source CSVs are unchanged.
 
-![Bronze count cell and expected record counts annotated](assets/screenshots/09-bronze.png)
-
-Expected counts in `default.seer_bronze`: **suppliers_raw 8, assets_raw 3, purchasing_raw 4, schedules_raw 4, inspections_raw 4**—23 rows in total. The screenshot is saved output from the older demo catalog; your output should begin with `default.seer_bronze`.
+Expected counts in `default.seer_bronze`: **suppliers_raw 8, assets_raw 3, purchasing_raw 4, schedules_raw 4, inspections_raw 4**—23 rows in total. Your output should begin with `default.seer_bronze`.
 
 **Stop if a load fails or a count differs.** Resolve it before starting Silver.
 
@@ -196,8 +170,6 @@ Return to the notebook folder and open **Lab1B_Silver_Transformations.ipynb**. A
 
 Read the comments before running each transformation. Each task produces one table from saved upstream tables; there is no separate Silver validation or quarantine task.
 
-![Silver count cell and expected counts annotated](assets/screenshots/10-silver.png)
-
 Expected counts in `default.seer_silver`: **suppliers 6, assets 3, purchase_orders 4, inspections 4, milestones 4**. Stop on errors or unexpected counts.
 
 ## Step 12 Complete Lab 1C Gold data
@@ -214,8 +186,6 @@ Open **Lab1C_Gold_Project_Data.ipynb**, attach the cluster, and run its five Pyt
 
 Task 1 aggregates before joining to avoid multiplying purchase-order costs. Tasks 2–4 consume saved tables. Inspect the displayed outputs after each cell; the fixture has three current feature milestones and one completed milestone with a known outcome.
 
-![Gold Spark SQL explanation and Python transformation cell annotated](assets/screenshots/11-gold.png)
-
 Refresh **Master catalog → default → seer_gold → Tables** and confirm all four table names. Lab 1 now has **5 Bronze + 5 Silver + 4 Gold tables**. The notebook's final lineage section has no additional Python cell: open a Gold table's **Actions → Lineage (Preview)** if you want to inspect its relationships.
 
 ## Step 13 Start Lab 2 and prepare the experiment
@@ -228,8 +198,6 @@ Open **Lab2_Predict_Investigate_and_Operationalize.ipynb** and attach the cluste
 | 2 | Load Gold training history | Inspect the training rows, nine inputs and class counts |
 | 3 | Create the train/validation split | Uses the same stratified 50/50 split with seed 42 for every candidate |
 | 4 | Define MLflow helpers | Defines training/logging and comparison functions; no candidate runs yet |
-
-![Lab 2 experiment setup and imports annotated](assets/screenshots/18-experiment-setup.png)
 
 Do not rerun Task 1 between training rounds: that starts another comparison session. The split requires enough rows from both classes. If data is missing, finish Lab 1C first.
 
@@ -245,8 +213,6 @@ Run **Task 5** once. It trains three Decision Tree candidates and logs three sep
 | `dt_r1_2` | 5 | 20 |
 | `dt_r1_3` | 8 | 30 |
 
-![Decision Tree parameter table and training cell annotated](assets/screenshots/12-round-one.png)
-
 Check that the Task 6 comparison contains the three intended completed runs. Record their run IDs. **Pause here** to inspect them in the UI before adding the second model family.
 
 ## Step 15 Inspect the first comparison in the UI
@@ -255,9 +221,7 @@ Open **Experiments → seer_milestone_delay** from the workspace navigation. In 
 
 Select their checkboxes and click **Compare**. Inspect the parameter/metric information and scroll to the **validation_f1** and **validation_brier_score** charts. Higher F1 and lower Brier are preferred. Do not register a winner yet.
 
-![Experiments filter and Compare view annotated](assets/screenshots/17-compare.png)
-
-The screenshot includes retained history. A name filter alone does not isolate a session; use current run IDs. Return to the same Lab 2 notebook/session when finished.
+The experiment retains run history. A name filter alone does not isolate a session; use current run IDs. Return to the same Lab 2 notebook/session when finished.
 
 ## Step 16 Train the second family and choose the best of all six
 
@@ -269,11 +233,7 @@ Run **Task 7** once. It adds three Gradient Boosting candidates to the **same ex
 | `gb_r2_2` | 3 | 0.10 | 100 |
 | `gb_r2_3` | 4 | 0.05 | 120 |
 
-![Gradient Boosting parameters and training loop annotated](assets/screenshots/13-round-two.png)
-
 After completion, run **Task 8** once. Verify that the notebook compares six completed candidates from this walkthrough. The selection rule is **highest validation F1, then lowest validation Brier score**, then run name to break a remaining tie. Record the selected run ID and metrics.
-
-![Final comparison and winner-selection code annotated](assets/screenshots/14-select.png)
 
 To repeat the visual comparison, return to **Experiments → seer_milestone_delay → List**, clear the name filter, select the six current run IDs and choose **Compare**. Historical runs stay in the experiment. If you accidentally reran a training cell, the current session may contain extra candidates; start a clean walkthrough at Task 1 rather than silently comparing the wrong set.
 
@@ -288,8 +248,6 @@ Confirm the output reports:
 - The selected source run ID
 - A URI such as `models:/default.seer_gold.milestone_delay_classifier/1` (use the actual returned version, which may not be 1)
 
-![Registration call, explicit version and output statements annotated](assets/screenshots/15-register.png)
-
 Browse **Master catalog → default → seer_gold → Models → milestone_delay_classifier → Versions** to inspect the registered version and its source-run link. Each registration creates a new version. If the cell appears to fail, check the Versions list before retrying.
 
 ## Step 18 Reload the registered model and score
@@ -297,8 +255,6 @@ Browse **Master catalog → default → seer_gold → Models → milestone_delay
 Run **Task 10** in the **same active notebook session**. It loads the exact registered version from Task 9 and scores the current `default.seer_gold.milestone_features` rows.
 
 Inspect the displayed milestone ID, project/milestone names, planned date, `delay_probability`, `predicted_late` and `model_version`. The classification threshold is 0.5. Expect three scoring rows with the supplied fixture.
-
-![Registered-model loading, scoring and output columns annotated](assets/screenshots/16-score.png)
 
 **Lab 2 ends here.** Scores are displayed, not written to a predictions table. No PDF ingestion, knowledge base, document volume or additional workflow is required. Stop your dedicated cluster through **Compute** when finished, in accordance with instructor guidance; do not stop shared compute used by other learners.
 
@@ -335,12 +291,12 @@ A lost Lab 2 session also loses variables such as `REGISTERED_URI`, `MODEL_VERSI
 | Gold training table missing | Finish Lab 1C Task 4 in the same configured catalog/schema |
 | Stratified split or ROC AUC fails | Inspect class counts; both train/validation partitions need both classes |
 | More than six candidates | A training cell was repeated in the same session; restart at Task 1 |
-| Model version differs from the screenshot | Normal after reruns; use the version returned by Task 9 |
+| Model version is greater than 1 | Normal after reruns; use the version returned by Task 9 |
 | Lineage is empty/loading | Refresh after execution and inspect current table identities; successful writes alone do not prove lineage capture |
 
 ## Included data and verification scope
 
-The five CSVs under [data](data/) contain 23 input rows. Keep their filenames unchanged. The notebook code is self-contained; `assets/screenshots` is documentation only.
+The five CSVs under [data](data/) contain 23 input rows. Keep their filenames unchanged. The notebook code is self-contained.
 
 Lab 1A's seven code cells were successfully executed on AIDP on October 5, 2026 using the existing demonstration catalog and workspace data folder. This guide update changes the checkout path to `/Workspace/aiw_hol` and keeps the requested `default` catalog setting. These new environment settings were statically checked but not re-executed on AIDP as part of the documentation update.
 
